@@ -1,0 +1,51 @@
+#EXTM3U
+#EXTINF:-1 group-title="NEWS" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/0/0f/Logo_of_WRC-TV.png",NBC 4 News (Washington DC) (HTTP Error: Request failed with status code 400)
+https://wrclive-f.akamaihd.net/i/wrcb1_1@46880/master.m3u8
+#EXTINF:-1 group-title="United Arab Emirates PREMIUM-SERVER1" tvg-logo="http://joinstreams.tv/wp-content/uploads/2016/10/Amen-FM-270x200.jpg",Amen FM 89.5 (HTTP Error: Request failed with status code 404)
+http://185.27.116.54:1935/live/amn/chunklist_w1521888123.m3u8
+#EXTINF:-1 tvg-id="" tvg-chno="692" tvg-name="Canal 45 TV" tvg-logo="http://content.iptvprivateserver.tv/stalker_portal/misc/logos/240/3663.png" group-title="Internationals",Canal 45 TV (HTTP Error: connect ECONNREFUSED 178.32.115.145:443)
+https://5940924978228.streamlock.net/f_Directo/f_Directo/master.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",GL (HTTP Error: Request failed with status code 502)
+http://kimbogrupol.com:25461/julian/julian1/16117
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="Canales Españoles",Canal 4 Tenerife SD (HTTP Error: connect ECONNREFUSED 178.32.115.145:443)
+https://5940924978228.streamlock.net/Directo2/Directo2/master.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: AlTounsia TV (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/63188.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: Aoula Maroc HD (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/63132.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: Attessia TV (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/105396.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: beIN DMAX (HTTP Error: Request failed with status code 403)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/94440.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: beoutQ 5 HD (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/131565.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: Cairo Drama (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/75158.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: CHADA TV HD (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/135542.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: CTV (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/63080.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: MAZIKA HITS (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/193095.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: MyHD My Home Cinema 6 (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/146104.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: OSN beIN BARAAEM (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/159038.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: OSN Movies First HD 2 (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/131156.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: OSN NAT GEO HD (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/70239.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: PALESTINE AL YOUM (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/121130.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: ROYA HD (HTTP Error: Request failed with status code 502)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/78585.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: S7T AFLAM HD (HTTP Error: Request failed with status code 403)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/147507.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER4",Great Russia (Wrong Content-Type: text/html; charset=UTF-8)
+http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: S7T SPORT HD (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/147519.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: OSN Movies First HD 2 (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/131156.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",AR: OSN NAT GEO HD (Wrong Content-Type: text/html; charset=UTF-8)
+http://31.220.1.190:8080/live/WuYC3qhd9/65udrOt48Y/70239.m3u8

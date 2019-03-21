@@ -1,0 +1,9 @@
+#EXTM3U
+#EXTINF:-1 group-title="Spain PREMIUM-SERVER4" tvg-name="WEB TV IEQ SERGIPE =" tvg-logo="http://quadrangular.alphanetcomunicacao.com.br/upload/logo.png",Broken
+http://fonte.iptvmaishd.com:25461/1325/1325/102572
+#EXTINF:-1 group-title="北方云",404
+http://httpdvb.slave.bfgd.com.cn:13164/httpdvb/hdahws_.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",404 after few layers
+http://118.98.221.131/live/smil:tvedukasi.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="India PREMIUM-SERVER2",404 after few layers
+http://150.242.21.2/drisya.m3u8
