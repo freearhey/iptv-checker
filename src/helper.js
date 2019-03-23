@@ -14,7 +14,12 @@ function getUrlPath(u) {
   return parsedUrl.host + parsedUrl.pathname + searchQuery
 }
 
+function normalizeString(str) {
+  return str.replace(/^\s*$(?:\r\n?|\n)/gm, '')
+}
+
 module.exports = {
   createUrl,
-  getUrlPath
+  getUrlPath,
+  normalizeString
 }
