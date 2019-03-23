@@ -32,9 +32,22 @@ function testCreateUrlWithDotsInPath() {
   console.log(arguments.callee.name, result === test)
 }
 
+function testNormalizeString() {
+  let str = `
+#EXTM3U
+#EXTINF:-1 tvg-logo="http://logosforapp.ddns.net:25461/images/logo/abu_dhabi_drama.jpg", AR-ABU DHABI DARAMA
+httphost://$http-raw=http://173.212.206.199:25461/1/2/763.m3u8$http-refferer=http://173.212.206.199:25461/`
+  let result = helper.normalizeString(str)
+  let test = `#EXTM3U
+#EXTINF:-1 tvg-logo="http://logosforapp.ddns.net:25461/images/logo/abu_dhabi_drama.jpg", AR-ABU DHABI DARAMA
+httphost://$http-raw=http://173.212.206.199:25461/1/2/763.m3u8$http-refferer=http://173.212.206.199:25461/`
+  console.log(arguments.callee.name, result === test)
+}
+
 module.exports = [
   testCreateUrlWithAbsolutePath,
   testCreateUrlWithoutSlashInPath,
   testCreateUrlWithSlashInPath,
-  testCreateUrlWithDotsInPath
+  testCreateUrlWithDotsInPath,
+  testNormalizeString
 ]
