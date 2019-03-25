@@ -172,7 +172,7 @@ async function parse(parent, parentTitle, url) {
 }
 
 function hasValidType(contentType) {
-  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|audio\/x-aac|audio\/aac|application\/mp2t|audio\/mpeg|audio\/mp4|video\/x-ms-asf|video\/x-mpegts)/i.test(contentType)
+  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|audio\/x-aac|audio\/aac|application\/mp2t|audio\/mpeg|audio\/mp4|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl)/i.test(contentType)
 }
 
 function isPlaylist(contentType) {
