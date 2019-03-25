@@ -5,6 +5,7 @@ const parsers = require('playlist-parser')
 const M3U = parsers.M3U
 const fs = require("fs")
 const axios = require('axios')
+const https = require('https')
 const minimist = require('minimist')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
@@ -37,7 +38,12 @@ fs.writeFileSync(onlineFile, '#EXTM3U\n')
 fs.writeFileSync(offlineFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
 
-let instance = axios.create({ timeout })
+let instance = axios.create({ 
+  timeout,
+  httpsAgent: new https.Agent({  
+    rejectUnauthorized: false
+  }) 
+})
 instance.defaults.headers.common["User-Agent"] = "VLC/2.2.4 LibVLC/2.2.4"
 
 let total = 0
