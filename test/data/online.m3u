@@ -9,3 +9,5 @@ http://kimbogrupol.com:25461/julian/julian1/16117
 https://5940924978228.streamlock.net/Directo2/Directo2/master.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER4",Great Russia (Wrong Content-Type: text/html; charset=UTF-8)
 http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8
+#EXTINF:-1 group-title="" tvg-id="" tvg-name="" tvg-logo="",FOX5
+https://api.new.livestream.com/accounts/2363281/events/1763520/live.m3u8
