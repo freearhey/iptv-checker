@@ -60,8 +60,6 @@ async function init()
   console.time('Execution time')
 
   let seedContent = fs.readFileSync(seedFile, { encoding: "utf8" })
-  
-  seedContent = helper.normalizeString(seedContent)
 
   let seedPlaylist = M3U.parse(seedContent).filter(i => i)
 
