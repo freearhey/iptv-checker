@@ -6,23 +6,27 @@ const M3U = parsers.M3U
 const fs = require("fs")
 const axios = require('axios')
 const HttpsProxyAgent = require('https-proxy-agent')
-const minimist = require('minimist')
+const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
 
-const argv = minimist(process.argv.slice(2), { 
-  boolean: 'debug', 
-  default: { debug: false }, 
-  alias: {
-    o: 'output',
-    t: 'timeout',
-    d: 'delay'
-  }
-})
-const seedFile = argv._[0]
-const outputDir = argv.o || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.t || 60000
-const delay = argv.d || 200
+let seedFile
+
+argv
+  .version('0.3.0', '-v, --version')
+  .usage('[options] <file>')
+  .option('-o, --output [output]', 'Path to output file')
+  .option('-t, --timeout [timeout]', 'Set the number of milliseconds before the request times out')
+  .option('-d, --delay [delay]', 'Set delay between each request')
+  .option('--debug', 'Toggle debug mode')
+  .action(function (file) {
+    seedFile = file
+  })
+  .parse(process.argv)
+
+const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
+const timeout = argv.timeout || 60000
+const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
