@@ -5,7 +5,7 @@ const parsers = require('playlist-parser')
 const M3U = parsers.M3U
 const fs = require("fs")
 const axios = require('axios')
-const https = require('https')
+const HttpsProxyAgent = require('https-proxy-agent')
 const minimist = require('minimist')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
@@ -40,7 +40,7 @@ fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
 
 let instance = axios.create({ 
   timeout,
-  httpsAgent: new https.Agent({  
+  httpsAgent: new HttpsProxyAgent({
     rejectUnauthorized: false
   }) 
 })
