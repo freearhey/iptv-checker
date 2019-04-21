@@ -5,7 +5,6 @@ const parsers = require('playlist-parser')
 const M3U = parsers.M3U
 const fs = require("fs")
 const axios = require('axios')
-const HttpsProxyAgent = require('https-proxy-agent')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
@@ -43,10 +42,7 @@ fs.writeFileSync(offlineFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
 
 let instance = axios.create({ 
-  timeout,
-  httpsAgent: new HttpsProxyAgent({
-    rejectUnauthorized: false
-  }) 
+  timeout
 })
 instance.defaults.headers.common["User-Agent"] = "VLC/2.2.4 LibVLC/2.2.4"
 
@@ -174,7 +170,7 @@ async function parse(parent, parentTitle, url) {
 }
 
 function hasValidType(contentType) {
-  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|audio\/x-aac|audio\/aac|application\/mp2t|audio\/mpeg|audio\/mp4|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl)/i.test(contentType)
+  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|audio\/x-aac|audio\/aac|application\/mp2t|audio\/mpeg|audio\/mp4|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl|binary\/octet-stream)/i.test(contentType)
 }
 
 function isPlaylist(contentType) {

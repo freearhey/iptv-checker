@@ -23,7 +23,6 @@
     "axios": "^0.19.0-beta.1",
     "commander": "^2.20.0",
     "dateformat": "^3.0.3",
-    "https-proxy-agent": "^2.2.1",
     "playlist-parser": "0.0.12",
     "progress": "^2.0.3"
   },
