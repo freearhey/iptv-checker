@@ -30,6 +30,7 @@ const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
+const radioFile = `${outputDir}/radio.m3u`
 
 try {
   fs.lstatSync(outputDir)
@@ -40,6 +41,7 @@ try {
 fs.writeFileSync(onlineFile, '#EXTM3U\n')
 fs.writeFileSync(offlineFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
+fs.writeFileSync(radioFile, '#EXTM3U\n')
 
 let instance = axios.create({ 
   timeout
@@ -50,6 +52,7 @@ let total = 0
 let online = 0
 let offline = 0
 let duplicates = 0
+let radio = 0
 let cache = {}
 let bar
 
@@ -85,7 +88,7 @@ async function init()
 
   }
 
-  console.log(`Total: ${total}. Online: ${online}. Offline: ${offline}. Duplicates: ${duplicates}.`)
+  console.log(`Total: ${total}. Online: ${online}. Offline: ${offline}. Duplicates: ${duplicates}. Radio: ${radio}`)
 
   // console.log(cache)
 }
@@ -124,15 +127,21 @@ async function parse(parent, parentTitle, url) {
 
     const contentType = response.headers['content-type']
 
-    let isValid = hasValidType(contentType)
+    // console.log(contentType)
 
-    // console.log(contentType, isValid)
-
-    if(isValid) {
+    if(isVideo(contentType)) {
 
       writeToFile(onlineFile, parentTitle, parent)
 
       online++
+
+      return
+
+    } else if(isAudio(contentType)) {
+
+      writeToFile(radioFile, parentTitle, parent)
+
+      radio++
 
       return
 
@@ -169,8 +178,12 @@ async function parse(parent, parentTitle, url) {
   }
 }
 
-function hasValidType(contentType) {
-  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|audio\/x-aac|audio\/aac|application\/mp2t|audio\/mpeg|audio\/mp4|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl|binary\/octet-stream)/i.test(contentType)
+function isVideo(contentType) {
+  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|application\/mp2t|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl|audio\/mpegurl)/i.test(contentType)
+}
+
+function isAudio(contentType) {
+  return /(audio\/x-aac|audio\/aac|audio\/mpeg|audio\/mp4)/i.test(contentType)
 }
 
 function isPlaylist(contentType) {
