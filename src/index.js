@@ -3,6 +3,7 @@
 const helper = require('./helper')
 const fs = require("fs")
 const axios = require('axios')
+const https = require('https')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
@@ -42,7 +43,10 @@ fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
 fs.writeFileSync(radioFile, '#EXTM3U\n')
 
 let instance = axios.create({ 
-  timeout
+  timeout,
+  httpsAgent: new https.Agent({  
+    rejectUnauthorized: false
+  })
 })
 instance.defaults.headers.common["User-Agent"] = "VLC/2.2.4 LibVLC/2.2.4"
 
