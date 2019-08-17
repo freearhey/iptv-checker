@@ -1,39 +1,39 @@
 #EXTM3U
-#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/0/08/Golf_Channel_Logo.png" tvg-name="GOLF" group-title="SPORT",GOLF
+#EXTINF:-1,original
 http://161.0.157.9/PLTV/88888888/224/3221226812/03.m3u8
-#EXTINF:-1 tvg-logo="http://console.celestialtiger.com/images/upload/abfcfecdbd01da31d6a5419131038890800440c4.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" tvg-name="GOLF CNBC" group-title="DEN'S TV",GOLF CNBC
+#EXTINF:-1,duplicate
 http://161.0.157.9/PLTV/88888888/224/3221226812/index.m3u8
-#EXTINF:-1 group-title="India PREMIUM-SERVER1" tvg-logo="https://vignette.wikia.nocookie.net/logopedia/images/2/20/FOXPremiumComedy.png",FOX Premium Comedy
+#EXTINF:-1,original
 http://161.0.157.9/PLTV/88888888/224/3221226800/index.m3u8
-#EXTINF:-1 tvg-logo="https://vignette.wikia.nocookie.net/logopedia/images/3/3b/Fox_%287%29.png/revision/latest?cb=20170228215758&path-prefix=es" tvg-name="FOX MOVIESS COMEDY" group-title="MOVIES",FOX MOVIESS COMEDY
+#EXTINF:-1,duplicate
 http://161.0.157.9/PLTV/88888888/224/3221226800/03.m3u8
-#EXTINF:-1 tvg-logo="https://mir-s3-cdn-cf.behance.net/project_modules/disp/ad7f8411572449.560f9d66db86b.jpg" group-title="Movies",Work (HTTP Error: Request failed with status code 404)
+#EXTINF:-1,original
 http://161.0.157.9/PLTV/88888888/224/3221226834/index.m3u8
-#EXTINF:-1 tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Max_Prime_2012_logo.svg/1280px-Max_Prime_2012_logo.svg.png" tvg-name="MAX PRIME" group-title="MOVIES",MAX PRIME
+#EXTINF:-1,duplicate
 http://161.0.157.9/PLTV/88888888/224/3221226834/03.m3u8
-#EXTINF:-1 tvg-logo="https://mir-s3-cdn-cf.behance.net/project_modules/disp/ad7f8411572449.560f9d66db86b.jpg" group-title="Movies",Max Prime (Latin America)
+#EXTINF:-1,duplicate
 http://161.0.157.9/PLTV/88888888/224/3221226834/index.m3u8
-#EXTINF:-1 tvg-logo="https://static.iptv-epg.com/gb/CartoonNetwork.uk.png" group-title="Cartoon Network",Cartoon Network
+#EXTINF:-1,original
 http://161.0.157.9/PLTV/88888888/224/3221226843/index.m3u8?fluxustv.m3u8
-#EXTINF:-1 group-title="India PREMIUM-SERVER1" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Cartoon_Network_2010_logo.svg/800px-Cartoon_Network_2010_logo.svg.png",Cartoon Network HD
+#EXTINF:-1,duplicate
 http://161.0.157.9/PLTV/88888888/224/3221226843/index.m3u8
-#EXTINF:-1 tvg-logo="http://www.firstonetv.net/images/logos/si/HBO2.png" group-title="LATINO",HBO 2
+#EXTINF:-1,original
 http://161.0.157.5/PLTV/88888888/224/3221227026/03.m3u8?fluxustv.m3u8
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",HBO 2 International
+#EXTINF:-1,duplicate
 http://161.0.157.5/PLTV/88888888/224/3221227026/03.m3u8
-#EXTINF:-1 group-title="WW: World Wide",WW: FISHING NETWORK
+#EXTINF:-1,original
 http://161.0.157.8/PLTV/88888888/224/3221226811/index.m3u8
-#EXTINF:-1 group-title="India PREMIUM-SERVER1" tvg-logo="https://upload.wikimedia.org/wikipedia/en/9/90/World_Fishing_Network.png",World Fishing Network
+#EXTINF:-1,duplicate
 http://161.0.157.8/PLTV/88888888/224/3221226811/index.m3u8?thebestfreeenglishchannels.m3u8
-#EXTINF:-1,VISIT-X TV (18+) (Wrong name)
+#EXTINF:-1,original
 http://stream.visit-x.tv:1935/vxtv/live_720p/playlist.m3u8
-#EXTINF:-1 group-title="Spain PREMIUM-SERVER4",VISIT-X TV (18+) (Wrong name with group)
+#EXTINF:-1,duplicate
 http://stream.visit-x.tv:1935/vxtv/live_720p/playlist.m3u8
-#EXTINF:-1 group-title="India PREMIUM-SERVER1" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Animal_Planet_logo_%28black_and_green%29.svg/800px-Animal_Planet_logo_%28black_and_green%29.svg.png",Original (duplicate http://161.0.157.5/PLTV/88888888/224/3221226253/03.m3u8)
+#EXTINF:-1,original
 http://161.0.157.5/PLTV/88888888/224/3221226253/index.m3u8
-#EXTINF:-1 tvg-logo="https://static.iptv-epg.com/gb/AnimalPlanet.uk.png" group-title="Discovery",Duplicate (original http://161.0.157.5/PLTV/88888888/224/3221226253/index.m3u8?fluxustv.m3u8)
+#EXTINF:-1,duplicate
 http://161.0.157.5/PLTV/88888888/224/3221226253/03.m3u8
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",Work (Binary and absolute path in playlist)
+#EXTINF:-1,original
 https://content.uplynk.com/channel/4ee18bd581dc4d3b90303e0cb9beeb0f.m3u8
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="United Arab Emirates PREMIUM-SERVER2",Work (Binary and absolute path in playlist)
+#EXTINF:-1,duplicate
 https://content.uplynk.com/channel/4ee18bd581dc4d3b90303e0cb9beeb0f.m3u8
