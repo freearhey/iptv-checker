@@ -163,7 +163,7 @@ async function parse(parent, currentUrl) {
 
       } else {
 
-        helper.writeToFile(offlineFile, parent.getInfo() + ' (Empty playlist)', parent.url)
+        helper.writeToFile(offlineFile, parent.getInfo() + ' (No streams)', parent.url)
 
         offline++
 
