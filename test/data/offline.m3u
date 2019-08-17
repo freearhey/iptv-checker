@@ -1,4 +1,6 @@
 #EXTM3U
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/STwssNi.jpg" group-title="",empty playlist
+http://192.99.38.174:1935/litustv/ngrp:litustv_all/playlist.m3u8?GrupoTopIptv
 #EXTINF:-1 group-title="Spain PREMIUM-SERVER4" tvg-name="WEB TV IEQ SERGIPE =" tvg-logo="http://quadrangular.alphanetcomunicacao.com.br/upload/logo.png",code 401
 http://fonte.iptvmaishd.com:25461/1325/1325/102572
 #EXTINF:-1 group-title="北方云",return JSON
