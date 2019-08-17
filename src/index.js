@@ -161,6 +161,12 @@ async function parse(parent, currentUrl) {
 
         await parse(parent, nextUrl)
 
+      } else {
+
+        helper.writeToFile(offlineFile, parent.getInfo() + ' (Empty playlist)', parent.url)
+
+        offline++
+
       }
 
       return
