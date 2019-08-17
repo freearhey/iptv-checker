@@ -1,6 +1,6 @@
 {
   "name": "iptv-checker",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "IPTV playlist checker",
   "main": "src/index.js",
   "preferGlobal": "true",
