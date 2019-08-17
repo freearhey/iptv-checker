@@ -111,6 +111,14 @@ async function parse(parent, currentUrl) {
 
   helper.addToCache(currentUrl)
 
+  if(parent.url.indexOf('rtmp://') > -1) {
+    helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+
+    online++
+
+    return
+  }
+
   try {
 
     await new Promise(resolve => {
@@ -149,7 +157,7 @@ async function parse(parent, currentUrl) {
 
       if(playlist.items.length) {
 
-        let nextUrl = helper.createUrl(parent.url, playlist.items[0].url)
+        let nextUrl = helper.createUrl(currentUrl, playlist.items[0].url)
 
         await parse(parent, nextUrl)
 
