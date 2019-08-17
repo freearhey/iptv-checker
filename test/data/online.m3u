@@ -1,4 +1,6 @@
 #EXTM3U x-tvg-url="http://195.154.221.171/epg/guidealbania.xml.gz"
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/wjwxp3K.png" group-title="",Tele Aruba Channel 13 (Wrong Content-Type: text/html)
+https://backend-server-dot-telearuba-app.appspot.com/media/livestream13/chunklist_w812279767_b1596000_sleng.m3u8
 #EXTINF:-1 tvg-id="RTSH 1 HD AL" tvg-name="RTSH 1 HD AL" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/RTSH_1_HD.svg/150px-RTSH_1_HD.svg.png" group-title="",RTSH 1 HD (Opt-1) (HTTP Error: Request failed with status code 503)
 http://79.106.48.2/live/rtsh_1ott/playlist.m3u8
 #EXTINF:-1 group-title="" tvg-logo="",rtmp
