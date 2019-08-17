@@ -1,8 +1,6 @@
 #! /usr/bin/env node
 
 const helper = require('./helper')
-const parsers = require('playlist-parser')
-const M3U = parsers.M3U
 const fs = require("fs")
 const axios = require('axios')
 const argv = require('commander')
@@ -53,7 +51,6 @@ let online = 0
 let offline = 0
 let duplicates = 0
 let radio = 0
-let cache = {}
 let bar
 
 init()
@@ -62,23 +59,28 @@ async function init()
 {
   console.time('Execution time')
 
-  let seedContent = fs.readFileSync(seedFile, { encoding: "utf8" })
+  const content = helper.readFile(seedFile)
 
-  let seedPlaylist = M3U.parse(seedContent).filter(i => i)
+  let playlist = helper.parsePlaylist(content)
 
-  bar = new ProgressBar(':bar', { total: seedPlaylist.length })
+  total = playlist.items.length
+  
+  bar = new ProgressBar(':bar', { total })
 
-  total = seedPlaylist.length
-
-  for(let seedItem of seedPlaylist) {
+  for(let item of playlist.items) {
 
     if(!debug) {
       bar.tick()
     }
 
-    const seedItemTitle = (seedItem.artist) ? seedItem.length + ',' + seedItem.artist + '-' + seedItem.title : seedItem.title
+    if(!item.inf || !item.url) continue
+
+    const channel = helper.createChannel({
+      info: item.inf,
+      url: item.url
+    })
     
-    await parse(seedItem.file, seedItemTitle, seedItem.file)
+    await parse(channel, channel.url)
   
   }
 
@@ -89,19 +91,17 @@ async function init()
   }
 
   console.log(`Total: ${total}. Online: ${online}. Offline: ${offline}. Duplicates: ${duplicates}. Radio: ${radio}`)
-
-  // console.log(cache)
 }
 
-async function parse(parent, parentTitle, url) {
+async function parse(parent, currentUrl) {
 
   if(debug) {
-    console.log('Parsing ', url)
+    console.log('Parsing ', currentUrl)
   }
 
-  if(checkCache(url)) {
+  if(helper.checkCache(currentUrl)) {
 
-    writeToFile(duplicatesFile, parentTitle + ' (Duplicate of ' + parent + ')', url)
+    helper.writeToFile(duplicatesFile, parent.getInfo() + ' (Duplicate of ' + parent.url + ')', currentUrl)
 
     duplicates++
 
@@ -109,7 +109,7 @@ async function parse(parent, parentTitle, url) {
 
   }
 
-  addToCache(url)
+  helper.addToCache(currentUrl)
 
   try {
 
@@ -117,43 +117,41 @@ async function parse(parent, parentTitle, url) {
       setTimeout(resolve, delay)
     })
 
-    const response = await instance.get(url)
+    const response = await instance.get(currentUrl)
 
     if(response.request.res.responseUrl) {
 
-      url = response.request.res.responseUrl
+      currentUrl = response.request.res.responseUrl
 
     }
 
     const contentType = response.headers['content-type']
 
-    // console.log(contentType)
+    if(helper.isVideo(contentType)) {
 
-    if(isVideo(contentType)) {
-
-      writeToFile(onlineFile, parentTitle, parent)
+      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
 
       online++
 
       return
 
-    } else if(isAudio(contentType)) {
+    } else if(helper.isAudio(contentType)) {
 
-      writeToFile(radioFile, parentTitle, parent)
+      helper.writeToFile(radioFile, parent.getInfo(), parent.url)
 
       radio++
 
       return
 
-    } else if(isPlaylist(contentType)) {
+    } else if(helper.isPlaylist(contentType)) {
 
-      let playlist = M3U.parse(response.data).filter(i => i)
+      let playlist = helper.parsePlaylist(response.data)
 
-      if(playlist.length) {
+      if(playlist.items.length) {
 
-        let nextUrl = helper.createUrl(url, playlist[0].file)
+        let nextUrl = helper.createUrl(parent.url, playlist.items[0].url)
 
-        await parse(parent, parentTitle, nextUrl)
+        await parse(parent, nextUrl)
 
       }
 
@@ -161,7 +159,7 @@ async function parse(parent, parentTitle, url) {
 
     }
 
-    writeToFile(offlineFile, parentTitle + ' (Wrong Content-Type: ' + contentType + ')', parent)
+    helper.writeToFile(offlineFile, parent.getInfo() + ' (Wrong Content-Type: ' + contentType + ')', parent.url)
 
     offline++
 
@@ -169,39 +167,9 @@ async function parse(parent, parentTitle, url) {
 
   } catch(e) {
 
-    // console.log('Parsing error:', e.message)
-
-    writeToFile(offlineFile, parentTitle + ' (HTTP Error: ' + e.message + ')', parent)
+    helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP Error: ' + e.message + ')', parent.url)
 
     offline++
 
   }
-}
-
-function isVideo(contentType) {
-  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|application\/mp2t|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl|audio\/mpegurl)/i.test(contentType)
-}
-
-function isAudio(contentType) {
-  return /(audio\/x-aac|audio\/aac|audio\/mpeg|audio\/mp4)/i.test(contentType)
-}
-
-function isPlaylist(contentType) {
-  return /(application\/vnd.apple.mpegurl|application\/x-mpegurl|application\/octet-stream|application\/vnd.apple.mpegusr|video\/basic|application\/x-mpegURL)/i.test(contentType)
-}
-
-function addToCache(url) {
-  let id = helper.getUrlPath(url)
-
-  cache[id] = true
-}
-
-function checkCache(url) {
-  let id = helper.getUrlPath(url)
-
-  return cache.hasOwnProperty(id)
-}
-
-function writeToFile(path, title, file) {
-  fs.appendFileSync(path, '#EXTINF:' + title + '\n' + file + '\n')
 }
