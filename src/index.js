@@ -188,9 +188,19 @@ async function parse(parent, currentUrl) {
 
   } catch(e) {
 
-    helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP Error: ' + e.message + ')', parent.url)
+    if(e.response) {
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP response error: ' + e.message + ')', parent.url)
 
-    offline++
+      offline++
+    } else if(e.request) {
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ')', parent.url)
+
+      offline++
+    } else {
+      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+
+      online++
+    }
 
   }
 }
