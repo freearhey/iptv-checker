@@ -1,7 +1,6 @@
 const fs = require("fs")
 const M3U8FileParser = require('m3u8-file-parser')
 const urlParser = require('url')
-const { URL } = urlParser
 
 let cache = {}
 
@@ -34,12 +33,6 @@ class Playlist {
   }
 }
 
-function createUrl(base, path) {
-  let link = new URL(path, base)
-
-  return link.href
-}
-
 function createChannel(data) {
   return new Channel({
     info: data.info,
@@ -68,10 +61,6 @@ function parsePlaylist(content) {
   })
 }
 
-function isPlaylist(contentType) {
-  return /(application\/vnd.apple.mpegurl|application\/x-mpegurl|application\/octet-stream|application\/vnd.apple.mpegusr|video\/basic|application\/x-mpegURL)/i.test(contentType)
-}
-
 function addToCache(url) {
   let id = getUrlPath(url)
 
@@ -89,12 +78,9 @@ function writeToFile(path, title, file) {
 }
 
 module.exports = {
-  createUrl,
-  getUrlPath,
   parsePlaylist,
   createChannel,
   readFile,
-  isPlaylist,
   addToCache,
   checkCache,
   writeToFile
