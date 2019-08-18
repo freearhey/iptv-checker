@@ -46,7 +46,7 @@ let instance = axios.create({
     rejectUnauthorized: false
   }),
   validateStatus: function (status) {
-    return (status >= 200 && status < 400) || status === 403
+    return status >= 200 && status < 404
   }
 })
 
@@ -120,43 +120,11 @@ async function parse(parent, currentUrl) {
       setTimeout(resolve, delay)
     })
 
-    const response = await instance.get(currentUrl)
+    await instance.get(currentUrl)
 
-    if(response.request.res.responseUrl) {
+    helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
 
-      currentUrl = response.request.res.responseUrl
-
-    }
-
-    const contentType = response.headers['content-type']
-
-    if(helper.isPlaylist(contentType)) {
-
-      let playlist = helper.parsePlaylist(response.data)
-
-      if(playlist.items.length) {
-
-        let nextIndex = playlist.items.length - 1
-
-        let nextUrl = helper.createUrl(currentUrl, playlist.items[nextIndex].url)
-
-        await parse(parent, nextUrl)
-
-      } else {
-
-        helper.writeToFile(offlineFile, parent.getInfo() + ' (No streams)', parent.url)
-
-        offline++
-
-      }
-
-    } else {
-
-      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
-
-      online++
-      
-    }
+    online++
 
   } catch(e) {
 
