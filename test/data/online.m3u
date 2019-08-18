@@ -1,4 +1,6 @@
 #EXTM3U x-tvg-url="http://195.154.221.171/epg/guidealbania.xml.gz"
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.tvyan.com/uploads/dianshi/wujiangtv.jpg" group-title="",吴江新闻综合 (HTTP Error: Cannot read property 'charCodeAt' of undefined)
+http://30515.hlsplay.aodianyun.com/lms_30515/tv_channel_239.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/H36G8wZ.png" group-title="",RTHK TV 31 (HK) (Opt-1) (New!) (HTTP Error: Request failed with status code 403)
 http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/p2eKv46.jpg" group-title="Local",TV Lux (HTTP Error: unable to verify the first certificate)
