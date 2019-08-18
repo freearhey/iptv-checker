@@ -155,7 +155,9 @@ async function parse(parent, currentUrl) {
 
       if(playlist.items.length) {
 
-        let nextUrl = helper.createUrl(currentUrl, playlist.items[0].url)
+        let nextIndex = playlist.items.length - 1
+
+        let nextUrl = helper.createUrl(currentUrl, playlist.items[nextIndex].url)
 
         await parse(parent, nextUrl)
 
