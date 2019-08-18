@@ -46,7 +46,10 @@ let instance = axios.create({
   timeout,
   httpsAgent: new https.Agent({  
     rejectUnauthorized: false
-  })
+  }),
+  validateStatus: function (status) {
+    return (status >= 200 && status < 300) || status === 403
+  }
 })
 instance.defaults.headers.common["User-Agent"] = "VLC/2.2.4 LibVLC/2.2.4"
 
