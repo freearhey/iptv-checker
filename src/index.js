@@ -115,7 +115,7 @@ async function parse(parent, currentUrl) {
 
   }
 
-  helper.addToCache(currentUrl)
+  helper.addToCache(parent.url)
 
   try {
 
