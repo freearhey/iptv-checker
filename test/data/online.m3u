@@ -1,4 +1,8 @@
 #EXTM3U x-tvg-url="http://195.154.221.171/epg/guidealbania.xml.gz"
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/H1-logo.svg/1200px-H1-logo.svg.png" group-title="",H1 (Opt-2) (HTTP response error: Request failed with status code 304)
+http://livestream.htp.tv/hls-live/livepkgr/_definst_/H1/H1_HQ.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",SYLT1 (Wrong Content-Type: undefined)
+http://62.67.13.54:1935/sylt1/sylt1_high.stream/chunklist.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/LcJZVV5.png" group-title="",Xuzhou TV 1 Shanghai (Opt-2) (New!) (HTTP request error: timeout of 60000ms exceeded)
 http://223.110.245.165/ott.js.chinamobile.com/PLTV/3/224/3221225945/index.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",万州影视文艺 (Opt-2) (HTTP request error: connect ECONNREFUSED 87.245.198.84:8017)
