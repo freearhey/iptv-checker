@@ -46,7 +46,7 @@ let instance = axios.create({
     rejectUnauthorized: false
   }),
   validateStatus: function (status) {
-    return (status >= 200 && status < 300) || status === 403
+    return (status >= 200 && status < 400) || status === 403
   }
 })
 
@@ -82,6 +82,18 @@ async function init()
       info: item.inf,
       url: item.url
     })
+
+    if(helper.checkCache(channel.url)) {
+
+      helper.writeToFile(duplicatesFile, channel.getInfo(), channel.url)
+
+      duplicates++
+
+      continue
+
+    }
+      
+    helper.addToCache(channel.url)
     
     await parse(channel, channel.url)
   
@@ -102,18 +114,6 @@ async function parse(parent, currentUrl) {
     console.log('Parsing ', currentUrl)
   }
 
-  if(helper.checkCache(currentUrl)) {
-
-    helper.writeToFile(duplicatesFile, parent.getInfo() + ' (Duplicate of ' + parent.url + ')', currentUrl)
-
-    duplicates++
-
-    return
-
-  }
-
-  helper.addToCache(parent.url)
-
   try {
 
     await new Promise(resolve => {
@@ -130,15 +130,7 @@ async function parse(parent, currentUrl) {
 
     const contentType = response.headers['content-type']
 
-    if(helper.isVideo(contentType)) {
-
-      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
-
-      online++
-
-      return
-
-    } else if(helper.isPlaylist(contentType)) {
+    if(helper.isPlaylist(contentType)) {
 
       let playlist = helper.parsePlaylist(response.data)
 
@@ -158,15 +150,13 @@ async function parse(parent, currentUrl) {
 
       }
 
-      return
+    } else {
 
+      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+
+      online++
+      
     }
-
-    helper.writeToFile(offlineFile, parent.getInfo() + ' (Wrong Content-Type: ' + contentType + ')', parent.url)
-
-    offline++
-
-    return 
 
   } catch(e) {
 
