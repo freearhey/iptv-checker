@@ -29,7 +29,6 @@ const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
-const radioFile = `${outputDir}/radio.m3u`
 
 try {
   fs.lstatSync(outputDir)
@@ -40,7 +39,6 @@ try {
 fs.writeFileSync(onlineFile, '#EXTM3U\n')
 fs.writeFileSync(offlineFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
-fs.writeFileSync(radioFile, '#EXTM3U\n')
 
 let instance = axios.create({ 
   timeout,
@@ -56,7 +54,6 @@ let total = 0
 let online = 0
 let offline = 0
 let duplicates = 0
-let radio = 0
 let bar
 
 init()
@@ -96,7 +93,7 @@ async function init()
 
   }
 
-  console.log(`Total: ${total}. Online: ${online}. Offline: ${offline}. Duplicates: ${duplicates}. Radio: ${radio}`)
+  console.log(`Total: ${total}. Online: ${online}. Offline: ${offline}. Duplicates: ${duplicates}.`)
 }
 
 async function parse(parent, currentUrl) {
@@ -138,14 +135,6 @@ async function parse(parent, currentUrl) {
       helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
 
       online++
-
-      return
-
-    } else if(helper.isAudio(contentType)) {
-
-      helper.writeToFile(radioFile, parent.getInfo(), parent.url)
-
-      radio++
 
       return
 

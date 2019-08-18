@@ -69,11 +69,7 @@ function parsePlaylist(content) {
 }
 
 function isVideo(contentType) {
-  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|application\/mp2t|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl|audio\/mpegurl|text\/html)/i.test(contentType)
-}
-
-function isAudio(contentType) {
-  return /(audio\/x-aac|audio\/aac|audio\/mpeg|audio\/mp4)/i.test(contentType)
+  return /(video\/m2ts|video\/mp2t|video\/mp4|video\/mpeg|application\/octet-stream|text\/plain|application\/binary|text\/vnd.trolltech.linguist|video\/vnd.dlna.mpeg-tts|application\/mp2t|video\/x-ms-asf|video\/x-mpegts|audio\/x-mpegurl|audio\/mpegurl|text\/html|audio\/x-aac|audio\/aac|audio\/mpeg|audio\/mp4)/i.test(contentType)
 }
 
 function isPlaylist(contentType) {
@@ -103,7 +99,6 @@ module.exports = {
   createChannel,
   readFile,
   isVideo,
-  isAudio,
   isPlaylist,
   addToCache,
   checkCache,
