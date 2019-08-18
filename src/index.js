@@ -23,7 +23,7 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.timeout || 60000
+const timeout = argv.timeout || 5000
 const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
@@ -118,14 +118,6 @@ async function parse(parent, currentUrl) {
 
   helper.addToCache(currentUrl)
 
-  if(parent.url.indexOf('rtmp://') > -1) {
-    helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
-
-    online++
-
-    return
-  }
-
   try {
 
     await new Promise(resolve => {
@@ -192,7 +184,7 @@ async function parse(parent, currentUrl) {
       helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP response error: ' + e.message + ')', parent.url)
 
       offline++
-    } else if(e.request) {
+    } else if(e.request && ['ENOTFOUND'].indexOf(e.code) > -1) {
       helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ')', parent.url)
 
       offline++
