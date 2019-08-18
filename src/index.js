@@ -51,7 +51,6 @@ let instance = axios.create({
     return (status >= 200 && status < 300) || status === 403
   }
 })
-instance.defaults.headers.common["User-Agent"] = "VLC/2.2.4 LibVLC/2.2.4"
 
 let total = 0
 let online = 0
