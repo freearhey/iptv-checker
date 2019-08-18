@@ -1,4 +1,14 @@
 #EXTM3U x-tvg-url="http://195.154.221.171/epg/guidealbania.xml.gz"
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/LcJZVV5.png" group-title="",Xuzhou TV 1 Shanghai (Opt-2) (New!) (HTTP request error: timeout of 60000ms exceeded)
+http://223.110.245.165/ott.js.chinamobile.com/PLTV/3/224/3221225945/index.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",万州影视文艺 (Opt-2) (HTTP request error: connect ECONNREFUSED 87.245.198.84:8017)
+http://wanzhoulive.cbg.cn:8017/d4ceB1a/1000/live.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.setv.sh.cn/images/logo.png" group-title="",上海教育 (HTTP request error: socket hang up)
+http://live.setv.sh.cn/slive/shedu02_1200k.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.tvyan.com/uploads/dianshi/tvs2.jpg" group-title="",南方卫视 (粤语) (HTTP request error: read ECONNRESET)
+http://nclive.grtn.cn/tvs2/sd/live.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.tvyan.com/uploads/dianshi/hzwhpd.jpg" group-title="",杭州文化 (HTTP request error: socket hang up)
+http://112.17.40.140/PLTV/88888888/224/3221226352/index.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.tvyan.com/uploads/dianshi/wujiangtv.jpg" group-title="",吴江新闻综合 (HTTP Error: Cannot read property 'charCodeAt' of undefined)
 http://30515.hlsplay.aodianyun.com/lms_30515/tv_channel_239.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/H36G8wZ.png" group-title="",RTHK TV 31 (HK) (Opt-1) (New!) (HTTP Error: Request failed with status code 403)
@@ -21,5 +31,7 @@ https://wrclive-f.akamaihd.net/i/wrcb1_1@46880/master.m3u8
 http://185.27.116.54:1935/live/amn/chunklist_w1521888123.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="Canales Españoles",Canal 4 Tenerife SD
 https://5940924978228.streamlock.net/Directo2/Directo2/master.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",timeout 60000ms
+http://kimbogrupol.com:25461/julian/julian1/16117
 #EXTINF:-1 group-title="" tvg-id="" tvg-name="" tvg-logo="",FOX5 (Protocol "http:" not supported. Expected "https:")
 https://api.new.livestream.com/accounts/2363281/events/1763520/live.m3u8
