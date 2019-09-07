@@ -23,7 +23,7 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.timeout || 5000
+const timeout = argv.timeout || 1000
 const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
@@ -44,10 +44,7 @@ let instance = axios.create({
   timeout,
   httpsAgent: new https.Agent({  
     rejectUnauthorized: false
-  }),
-  validateStatus: function (status) {
-    return status >= 200 && status < 404
-  }
+  })
 })
 
 let total = 0
@@ -132,8 +129,8 @@ async function parse(parent, currentUrl) {
       helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP response error: ' + e.message + ')', parent.url)
 
       offline++
-    } else if(e.request && ['ENOTFOUND'].indexOf(e.code) > -1) {
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ')', parent.url)
+    } else if(e.request && ['ECONNABORTED'].indexOf(e.code) === -1) {
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
 
       offline++
     } else {
