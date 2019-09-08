@@ -23,11 +23,12 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.timeout || 1000
+const timeout = argv.timeout || 5000
 const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
+const timeoutFile = `${outputDir}/timeout.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 try {
@@ -38,6 +39,7 @@ try {
 
 fs.writeFileSync(onlineFile, '#EXTM3U\n')
 fs.writeFileSync(offlineFile, '#EXTM3U\n')
+fs.writeFileSync(timeoutFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
 
 let instance = axios.create({ 
@@ -47,11 +49,14 @@ let instance = axios.create({
   })
 })
 
-let total = 0
-let online = 0
-let offline = 0
-let duplicates = 0
 let bar
+let stats = {
+  total: 0,
+  online: 0,
+  offline: 0,
+  timeout: 0,
+  duplicates: 0
+}
 
 init()
 
@@ -63,9 +68,9 @@ async function init()
 
   let playlist = helper.parsePlaylist(content)
 
-  total = playlist.items.length
+  stats.total = playlist.items.length
   
-  bar = new ProgressBar(':bar', { total })
+  bar = new ProgressBar(':bar', { total: stats.total })
 
   for(let item of playlist.items) {
 
@@ -84,7 +89,7 @@ async function init()
 
       helper.writeToFile(duplicatesFile, channel.getInfo(), channel.url)
 
-      duplicates++
+      stats.duplicates++
 
       continue
 
@@ -102,7 +107,7 @@ async function init()
 
   }
 
-  console.log(`Total: ${total}. Online: ${online}. Offline: ${offline}. Duplicates: ${duplicates}.`)
+  console.log(`Total: ${stats.total}. Online: ${stats.online}. Offline: ${stats.offline}. Timeout: ${stats.timeout}. Duplicates: ${stats.duplicates}.`)
 }
 
 async function parse(parent, currentUrl) {
@@ -117,26 +122,56 @@ async function parse(parent, currentUrl) {
       setTimeout(resolve, delay)
     })
 
-    await instance.get(currentUrl)
+    let response = await instance.get(currentUrl)
 
-    helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+    let string = response.data.toString()
 
-    online++
+    let head = string.slice(0,7)
+
+    if(head === '#EXTM3U') {
+
+      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+
+      stats.online++
+
+    } else {
+
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (Wrong content header)', parent.url)
+
+      stats.offline++
+
+    }
 
   } catch(e) {
 
     if(e.response) {
+
       helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP response error: ' + e.message + ')', parent.url)
 
-      offline++
-    } else if(e.request && ['ECONNABORTED'].indexOf(e.code) === -1) {
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
+      stats.offline++
 
-      offline++
+    } else if(e.request) {
+
+      if(['ECONNABORTED'].indexOf(e.code) > -1) {
+
+        helper.writeToFile(timeoutFile, parent.getInfo(), parent.url)
+
+        stats.timeout++
+
+      } else {
+
+        helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
+
+        stats.offline++
+
+      }
+
     } else {
+
       helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
 
-      online++
+      stats.online++
+    
     }
 
   }
