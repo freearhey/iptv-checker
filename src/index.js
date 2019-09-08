@@ -45,6 +45,9 @@ let instance = axios.create({
   httpsAgent: new https.Agent({  
     rejectUnauthorized: false
   }),
+  validateStatus: function (status) {
+    return status >= 200 && status < 400
+  },
   headers: {
     'Accept': '*/*',
     'Accept-Language': 'en_US',
