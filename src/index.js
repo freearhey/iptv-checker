@@ -28,7 +28,6 @@ const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
-const timeoutFile = `${outputDir}/timeout.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 try {
@@ -39,7 +38,6 @@ try {
 
 fs.writeFileSync(onlineFile, '#EXTM3U\n')
 fs.writeFileSync(offlineFile, '#EXTM3U\n')
-fs.writeFileSync(timeoutFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
 
 let instance = axios.create({ 
@@ -60,7 +58,6 @@ let stats = {
   total: 0,
   online: 0,
   offline: 0,
-  timeout: 0,
   duplicates: 0
 }
 
@@ -113,7 +110,7 @@ async function init()
 
   }
 
-  console.log(`Total: ${stats.total}. Online: ${stats.online}. Offline: ${stats.offline}. Timeout: ${stats.timeout}. Duplicates: ${stats.duplicates}.`)
+  console.log(`Total: ${stats.total}. Online: ${stats.online}. Offline: ${stats.offline}. Duplicates: ${stats.duplicates}.`)
 }
 
 async function parse(parent, currentUrl) {
@@ -142,7 +139,7 @@ async function parse(parent, currentUrl) {
 
     } else {
 
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (Parsing error: Wrong content)', parent.url)
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (Parsing error: Wrong content type)', parent.url)
 
       stats.offline++
 
@@ -158,25 +155,15 @@ async function parse(parent, currentUrl) {
 
     } else if(e.request) {
 
-      if(['ECONNABORTED'].indexOf(e.code) > -1) {
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
 
-        helper.writeToFile(timeoutFile, parent.getInfo(), parent.url)
-
-        stats.timeout++
-
-      } else {
-
-        helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
-
-        stats.offline++
-
-      }
+      stats.offline++
 
     } else {
 
-      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (Error: ' + e.message + ')', parent.url)
 
-      stats.online++
+      stats.offline++
     
     }
 
