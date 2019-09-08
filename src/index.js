@@ -136,7 +136,7 @@ async function parse(parent, currentUrl) {
 
     } else {
 
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (Wrong content header)', parent.url)
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (Parsing error: Wrong content)', parent.url)
 
       stats.offline++
 
