@@ -11,7 +11,7 @@ const dateFormat = require('dateformat')
 let seedFile
 
 argv
-  .version('0.8.0', '-v, --version')
+  .version('0.8.1', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
   .option('-t, --timeout [timeout]', 'Set the number of milliseconds before the request times out')
@@ -23,7 +23,7 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.timeout || 5000
+const timeout = argv.timeout || 60000
 const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
@@ -46,7 +46,13 @@ let instance = axios.create({
   timeout,
   httpsAgent: new https.Agent({  
     rejectUnauthorized: false
-  })
+  }),
+  headers: {
+    'Accept': '*/*',
+    'Accept-Language': 'en_US',
+    'User-Agent': 'VLC/3.0.8 LibVLC/3.0.8',
+    'Range': 'bytes=0-'
+  }
 })
 
 let bar
