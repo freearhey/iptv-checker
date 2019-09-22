@@ -23,7 +23,7 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.timeout || 60000
+const timeout = argv.timeout || 5000
 const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
@@ -158,9 +158,19 @@ async function parse(parent, currentUrl) {
 
     } else if(e.request) {
 
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
+      if(['ECONNABORTED'].indexOf(e.code) > -1) {
 
-      stats.offline++
+        helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+
+        stats.online++
+
+      } else {
+
+        helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
+
+        stats.offline++
+
+      }
 
     } else {
 
