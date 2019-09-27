@@ -11,7 +11,7 @@ const dateFormat = require('dateformat')
 let seedFile
 
 argv
-  .version('0.10.0', '-v, --version')
+  .version('0.10.1', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
   .option('-t, --timeout [timeout]', 'Set the number of milliseconds before the request times out')
