@@ -1,3 +1,3 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",online (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
-http://54.180.143.6:9981/stream/channelid/2118383563
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.tvyan.com/uploads/dianshi/tvs2.jpg" group-title="",timeout
+http://nclive.grtn.cn/tvs2/sd/live.m3u8
