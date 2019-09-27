@@ -147,9 +147,19 @@ async function parse(parent, currentUrl) {
 
     } else if(e.request) {
 
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
+      if(['ECONNRESET'].indexOf(e.code) > -1) {
 
-      stats.offline++
+        helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+
+        stats.online++
+      
+      } else {
+
+        helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
+
+        stats.offline++
+
+      }
 
     } else {
 
