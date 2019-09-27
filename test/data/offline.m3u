@@ -9,3 +9,7 @@ http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8
 http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
 #EXTINF:-1 group-title="" tvg-logo="",rtmp (HTTP request error: connect ECONNREFUSED 144.76.86.246:80 with status code ECONNREFUSED)
 rtmp://streaming.austria24.tv/live/stream_720p
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",903AuthInvalid
+http://190.2.154.164/TV3744
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",903AuthInvalid
+http://190.2.154.164/TV3745

@@ -1,7 +1,7 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.tvyan.com/uploads/dianshi/tvs2.jpg" group-title="",online
-http://nclive.grtn.cn/tvs2/sd/live.m3u8
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",online
-http://190.2.154.164/TV3744
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",offline
-http://190.2.154.164/TV3745
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",Sada El Balad (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
+http://149.100.10.162:8014/play/s204
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",pooq 쇼핑엔티 (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
+http://54.180.143.6:9981/stream/channelid/1555268075
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",QBS (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
+http://54.180.143.6:9981/stream/channelid/1401718519
