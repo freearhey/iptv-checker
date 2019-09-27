@@ -23,7 +23,7 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.timeout || 5000
+const timeout = argv.timeout || 60000
 const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
@@ -53,7 +53,8 @@ let instance = axios.create({
     'Accept-Language': 'en_US',
     'User-Agent': 'VLC/3.0.8 LibVLC/3.0.8',
     'Range': 'bytes=0-'
-  }
+  },
+  responseType: 'stream'
 })
 
 let bar
@@ -130,23 +131,11 @@ async function parse(parent, currentUrl) {
 
     let response = await instance.get(currentUrl)
 
-    let string = response.data.toString()
+    response.data.destroy()
 
-    let head = string.slice(0,7)
+    helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
 
-    if(head === '#EXTM3U') {
-
-      helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
-
-      stats.online++
-
-    } else {
-
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (Parsing error: Wrong content type)', parent.url)
-
-      stats.offline++
-
-    }
+    stats.online++
 
   } catch(e) {
 
