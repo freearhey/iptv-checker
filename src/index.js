@@ -158,19 +158,9 @@ async function parse(parent, currentUrl) {
 
     } else if(e.request) {
 
-      if(['ECONNABORTED'].indexOf(e.code) > -1) {
+      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
 
-        helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
-
-        stats.online++
-
-      } else {
-
-        helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
-
-        stats.offline++
-
-      }
+      stats.offline++
 
     } else {
 
