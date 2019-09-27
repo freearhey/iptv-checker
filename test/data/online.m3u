@@ -35,3 +35,5 @@ http://118.98.221.131/live/smil:tvedukasi.smil/playlist.m3u8
 http://150.242.21.2/drisya.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://raw.githubusercontent.com/jnk22/kodinerds-iptv/master/logos/tv/parlamentsfernsehen.png" group-title="",code 503 (fixed)
 https://c13014-l-hls.u.core.cdn.streamfarm.net/1000153copo/hk1.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="http://www.tvyan.com/uploads/dianshi/tvs2.jpg" group-title="",timeout some times
+http://nclive.grtn.cn/tvs2/sd/live.m3u8
