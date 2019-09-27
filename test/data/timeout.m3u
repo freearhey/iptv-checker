@@ -1,7 +1,3 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",Sada El Balad (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
-http://149.100.10.162:8014/play/s204
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",pooq 쇼핑엔티 (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
-http://54.180.143.6:9981/stream/channelid/1555268075
-#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",QBS (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
-http://54.180.143.6:9981/stream/channelid/1401718519
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",online (HTTP request error: timeout of 5000ms exceeded with status code ECONNABORTED)
+http://54.180.143.6:9981/stream/channelid/2118383563
