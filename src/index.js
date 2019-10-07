@@ -83,16 +83,11 @@ async function init()
       bar.tick()
     }
 
-    if(!item.inf || !item.url) continue
+    if(!item.url) continue
 
-    const channel = helper.createChannel({
-      info: item.inf,
-      url: item.url
-    })
+    if(helper.checkCache(item.url)) {
 
-    if(helper.checkCache(channel.url)) {
-
-      helper.writeToFile(duplicatesFile, channel.getInfo(), channel.url)
+      helper.writeToFile(duplicatesFile, item)
 
       stats.duplicates++
 
@@ -100,9 +95,9 @@ async function init()
 
     }
       
-    helper.addToCache(channel.url)
+    helper.addToCache(item.url)
     
-    await parse(channel, channel.url)
+    await parse(item, item.url)
   
   }
 
@@ -131,7 +126,7 @@ async function parse(parent, currentUrl) {
 
     response.data.destroy()
 
-    helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+    helper.writeToFile(onlineFile, parent)
 
     stats.online++
 
@@ -139,7 +134,7 @@ async function parse(parent, currentUrl) {
 
     if(e.response) {
 
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP response error: ' + e.message + ')', parent.url)
+      helper.writeToFile(offlineFile, parent, 'HTTP response error: ' + e.message)
 
       stats.offline++
 
@@ -147,13 +142,13 @@ async function parse(parent, currentUrl) {
 
       if(['ECONNRESET'].indexOf(e.code) > -1) {
 
-        helper.writeToFile(onlineFile, parent.getInfo(), parent.url)
+        helper.writeToFile(onlineFile, parent)
 
         stats.online++
       
       } else {
 
-        helper.writeToFile(offlineFile, parent.getInfo() + ' (HTTP request error: ' + e.message + ' with status code ' + e.code + ')', parent.url)
+        helper.writeToFile(offlineFile, parent, 'HTTP request error: ' + e.message + ' with status code ' + e.code)
 
         stats.offline++
 
@@ -161,7 +156,7 @@ async function parse(parent, currentUrl) {
 
     } else {
 
-      helper.writeToFile(offlineFile, parent.getInfo() + ' (Error: ' + e.message + ')', parent.url)
+      helper.writeToFile(offlineFile, parent, 'Error: ' + e.message)
 
       stats.offline++
     

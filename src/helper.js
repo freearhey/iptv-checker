@@ -1,44 +1,8 @@
 const fs = require("fs")
-const M3U8FileParser = require('m3u8-file-parser')
+const parser = require('iptv-playlist-parser')
 const urlParser = require('url')
 
 let cache = {}
-
-class Channel {
-  constructor(data) {
-    this.info = data.info
-    this.url = data.url
-  }
-
-  getInfo() {
-    const duration = this.info.duration
-    const title = this.info.title
-    let info = this.info
-    delete info.duration
-    delete info.title
-    let attrs = []
-    for(const key in info) {
-      const value = info[key]
-      attrs.push(`${key}="${value}"`)
-    }
-
-    return `${duration} ${attrs.join(' ')},${title}`
-  }
-}
-
-class Playlist {
-  constructor(data) {
-    this.attrs = data.attrs
-    this.items = data.items
-  }
-}
-
-function createChannel(data) {
-  return new Channel({
-    info: data.info,
-    url: data.url
-  })
-}
 
 function getUrlPath(u) {
   let parsedUrl = urlParser.parse(u)
@@ -51,15 +15,11 @@ function readFile(filepath) {
   return fs.readFileSync(filepath, { encoding: "utf8" })
 }
 
-function parsePlaylist(content) {
-  const content = readFile(seedFile)
-  const parser = new M3U8FileParser()
-  parser.read(content)
-  let results = parser.getResult()
+function parsePlaylist(file) {
+  const content = readFile(file)
+  const result = parser.parse(content)
 
-  return new Playlist({
-    items: results.segments
-  })
+  return result
 }
 
 function addToCache(url) {
@@ -74,13 +34,22 @@ function checkCache(url) {
   return cache.hasOwnProperty(id)
 }
 
-function writeToFile(path, title, file) {
-  fs.appendFileSync(path, '#EXTINF:' + title + '\n' + file + '\n')
+function writeToFile(path, item, message = null) {
+  const parts = item.raw.split('\n')
+  let output = [
+    parts[0],
+    item.url
+  ]
+
+  if(message) {
+    output[0] += ` (${message})`
+  }
+
+  fs.appendFileSync(path, `${output.join('\n')}\n`)
 }
 
 module.exports = {
   parsePlaylist,
-  createChannel,
   readFile,
   addToCache,
   checkCache,
