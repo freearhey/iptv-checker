@@ -52,6 +52,7 @@ function readFile(filepath) {
 }
 
 function parsePlaylist(content) {
+  const content = readFile(seedFile)
   const parser = new M3U8FileParser()
   parser.read(content)
   let results = parser.getResult()

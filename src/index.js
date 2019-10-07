@@ -71,9 +71,7 @@ async function init()
 {
   console.time('Execution time')
 
-  const content = helper.readFile(seedFile)
-
-  let playlist = helper.parsePlaylist(content)
+  let playlist = helper.parsePlaylist(seedFile)
 
   stats.total = playlist.items.length
   
