@@ -4,8 +4,6 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
 
 const helper = require('./helper')
 const fs = require("fs")
-const axios = require('axios')
-const https = require('https')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
@@ -40,23 +38,6 @@ try {
 fs.writeFileSync(onlineFile, '#EXTM3U\n')
 fs.writeFileSync(offlineFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
-
-let instance = axios.create({ 
-  timeout,
-  httpsAgent: new https.Agent({  
-    rejectUnauthorized: false
-  }),
-  validateStatus: function (status) {
-    return status >= 200 && status < 400
-  },
-  headers: {
-    'Accept': '*/*',
-    'Accept-Language': 'en_US',
-    'User-Agent': 'VLC/3.0.8 LibVLC/3.0.8',
-    'Range': 'bytes=0-'
-  },
-  responseType: 'stream'
-})
 
 let bar
 let stats = {
