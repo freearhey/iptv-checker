@@ -11,7 +11,6 @@ npm install -g iptv-checker
 Arguments:
 
 - `-o, --output`: change default output directory
-- `-t, --timeout`: specifies the number of milliseconds before the request will be aborted (default to 60000)
 - `-d, --delay`: delay in milliseconds between each request (default to 200)
 
 ## Usage
