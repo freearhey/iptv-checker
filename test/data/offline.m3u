@@ -13,3 +13,7 @@ rtmp://streaming.austria24.tv/live/stream_720p
 http://190.2.154.164/TV3744
 #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",903AuthInvalid
 http://190.2.154.164/TV3745
+#EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="" group-title="",socket hang up
+http://54.180.143.6:9981/stream/channelid/2118383563
+#EXTINF:-1,timeout
+http://173.208.166.179/zan_tv_live_456qwer586_stop_tyui123ikm159-fuck-off/tracks-v1a1/mono.m3u8
