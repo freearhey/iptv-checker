@@ -15,7 +15,10 @@ argv
   .version('0.10.2', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
-  .option('-d, --delay [delay]', 'Set delay between each request')
+  .option('-t, --timeout <timeout>', 'Set the number of milliseconds before the request times out', 60000)
+  .option('-d, --delay <delay>', 'Set delay between each request', 200)
+  .option('--max-redirects <redirects>', 'Defines the maximum number of redirects to follow', 2)
+  .option('--max-retries <retries>', 'Number of times to retry the request if there is a 500 or connection error', 0)
   .option('--debug', 'Toggle debug mode')
   .action(function (file) {
     seedFile = file
@@ -23,11 +26,17 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const delay = argv.delay || 200
-const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
+
+const config = {
+  timeout: parseInt(argv.timeout),
+  delay: parseInt(argv.delay),
+  debug: argv.debug,
+  maxRedirects: parseInt(argv.maxRedirects),
+  maxRetries: parseInt(argv.maxRetries)
+}
 
 try {
   fs.lstatSync(outputDir)
@@ -61,7 +70,7 @@ async function init()
 
   for(let item of playlist.items) {
 
-    if(!debug) {
+    if(!config.debug) {
       bar.tick()
     }
 
@@ -79,32 +88,49 @@ async function init()
       
     helper.addToCache(item.url)
     
-    await parse(item, item.url)
+    await check(item, item.url)
   
   }
 
-  if(debug) {
-
+  if(config.debug) {
     console.timeEnd('Execution time')
-
   }
 
   console.log(`Total: ${stats.total}. Online: ${stats.online}. Offline: ${stats.offline}. Duplicates: ${stats.duplicates}.`)
+
+  process.exit(0)
 }
 
-async function parse(parent, currentUrl) {
+async function check(parent, currentUrl) {
 
   return new Promise((resolve, reject) => {
 
-    if(debug) {
-      console.log('Parsing', currentUrl)
+    if(config.debug) {
+      console.log('Checking', currentUrl)
     }
 
     const stream = m3u8stream(currentUrl, {
       requestOptions: {
-        maxRetries: 0
+        maxRetries: config.maxRetries,
+        maxRedirects: config.maxRedirects
       }
     })
+
+    setTimeout(function() {
+    
+      stream.end()
+      
+      helper.writeToFile(offlineFile, parent, `Timeout of ${config.timeout}ms exceeded`)
+
+      if(config.debug) {
+        console.log(`Error: Timeout of ${config.timeout}ms exceeded`)
+      }
+
+      stats.offline++
+
+      setTimeout(resolve, config.delay)
+    
+    }, config.timeout)
 
     stream.on('data', (data) => {
 
@@ -114,7 +140,7 @@ async function parse(parent, currentUrl) {
 
       stats.online++
 
-      setTimeout(resolve, delay)
+      setTimeout(resolve, config.delay)
 
     }).on('error', (e) => {
 
@@ -122,9 +148,13 @@ async function parse(parent, currentUrl) {
 
       helper.writeToFile(offlineFile, parent, e.message)
 
+      if(config.debug) {
+        console.log(`Error: ${e.message}`)
+      }
+
       stats.offline++
 
-      setTimeout(resolve, delay)
+      setTimeout(resolve, config.delay)
     
     })
 
