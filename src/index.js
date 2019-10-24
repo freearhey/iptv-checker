@@ -1,5 +1,7 @@
 #! /usr/bin/env node
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
+
 const helper = require('./helper')
 const fs = require("fs")
 const axios = require('axios')
@@ -7,6 +9,7 @@ const https = require('https')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
+const m3u8stream = require('m3u8stream')
 
 let seedFile
 
@@ -14,7 +17,6 @@ argv
   .version('0.10.2', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
-  .option('-t, --timeout [timeout]', 'Set the number of milliseconds before the request times out')
   .option('-d, --delay [delay]', 'Set delay between each request')
   .option('--debug', 'Toggle debug mode')
   .action(function (file) {
@@ -23,7 +25,6 @@ argv
   .parse(process.argv)
 
 const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const timeout = argv.timeout || 60000
 const delay = argv.delay || 200
 const debug = argv.debug
 const onlineFile = `${outputDir}/online.m3u`
@@ -112,55 +113,39 @@ async function init()
 
 async function parse(parent, currentUrl) {
 
-  if(debug) {
-    console.log('Parsing ', currentUrl)
-  }
+  return new Promise((resolve, reject) => {
 
-  try {
-
-    await new Promise(resolve => {
-      setTimeout(resolve, delay)
-    })
-
-    let response = await instance.get(currentUrl)
-
-    response.data.destroy()
-
-    helper.writeToFile(onlineFile, parent)
-
-    stats.online++
-
-  } catch(e) {
-
-    if(e.response) {
-
-      helper.writeToFile(offlineFile, parent, 'HTTP response error: ' + e.message)
-
-      stats.offline++
-
-    } else if(e.request) {
-
-      if(['ECONNRESET'].indexOf(e.code) > -1) {
-
-        helper.writeToFile(onlineFile, parent)
-
-        stats.online++
-      
-      } else {
-
-        helper.writeToFile(offlineFile, parent, 'HTTP request error: ' + e.message + ' with status code ' + e.code)
-
-        stats.offline++
-
-      }
-
-    } else {
-
-      helper.writeToFile(offlineFile, parent, 'Error: ' + e.message)
-
-      stats.offline++
-    
+    if(debug) {
+      console.log('Parsing', currentUrl)
     }
 
-  }
+    const stream = m3u8stream(currentUrl, {
+      requestOptions: {
+        maxRetries: 0
+      }
+    })
+
+    stream.on('data', (data) => {
+
+      stream.end()
+    
+      helper.writeToFile(onlineFile, parent)
+
+      stats.online++
+
+      setTimeout(resolve, delay)
+
+    }).on('error', (e) => {
+
+      stream.end()
+
+      helper.writeToFile(offlineFile, parent, e.message)
+
+      stats.offline++
+
+      setTimeout(resolve, delay)
+    
+    })
+
+  })
 }
