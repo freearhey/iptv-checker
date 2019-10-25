@@ -15,7 +15,7 @@ argv
   .version('0.10.2', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
-  .option('-d, --delay <delay>', 'Set delay between each request', 200)
+  .option('-t, --timeout [timeout]', 'Timeout in seconds', 60)
   .option('--debug', 'Toggle debug mode')
   .action(function (file) {
     seedFile = file
@@ -28,8 +28,8 @@ const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 const config = {
-  delay: parseInt(argv.delay),
-  debug: argv.debug
+  debug: argv.debug,
+  timeout: argv.timeout
 }
 
 try {
@@ -103,14 +103,14 @@ async function check(parent, currentUrl) {
       console.log('Checking', currentUrl)
     }
 
-    ffmpeg.ffprobe(currentUrl, function(err, metadata) {
+    ffmpeg(currentUrl, { timeout: config.timeout }).ffprobe(async function(err, metadata) {
       
       if(err) {
 
         helper.writeToFile(offlineFile, parent)
 
         if(config.debug) {
-          console.log(`Error: ${err}`)
+          console.log(err)
         }
 
         stats.offline++
@@ -123,7 +123,7 @@ async function check(parent, currentUrl) {
 
       }
 
-      setTimeout(resolve, config.delay)
+      resolve()
 
     })
 
