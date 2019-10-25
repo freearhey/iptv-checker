@@ -29,8 +29,8 @@
   "dependencies": {
     "commander": "^2.20.0",
     "dateformat": "^3.0.3",
+    "fluent-ffmpeg": "^2.1.2",
     "iptv-playlist-parser": "^0.2.2",
-    "m3u8stream": "^0.6.2",
     "progress": "^2.0.3"
   },
   "engines": {

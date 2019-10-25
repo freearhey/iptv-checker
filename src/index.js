@@ -7,7 +7,7 @@ const fs = require("fs")
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
-const m3u8stream = require('m3u8stream')
+const ffmpeg = require('fluent-ffmpeg')
 
 let seedFile
 
@@ -15,10 +15,7 @@ argv
   .version('0.10.2', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
-  .option('-t, --timeout <timeout>', 'Set the number of milliseconds before the request times out', 60000)
   .option('-d, --delay <delay>', 'Set delay between each request', 200)
-  .option('--max-redirects <redirects>', 'Defines the maximum number of redirects to follow', 2)
-  .option('--max-retries <retries>', 'Number of times to retry the request if there is a 500 or connection error', 0)
   .option('--debug', 'Toggle debug mode')
   .action(function (file) {
     seedFile = file
@@ -31,11 +28,8 @@ const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 const config = {
-  timeout: parseInt(argv.timeout),
   delay: parseInt(argv.delay),
-  debug: argv.debug,
-  maxRedirects: parseInt(argv.maxRedirects),
-  maxRetries: parseInt(argv.maxRetries)
+  debug: argv.debug
 }
 
 try {
@@ -87,9 +81,9 @@ async function init()
     }
       
     helper.addToCache(item.url)
-    
+
     await check(item, item.url)
-  
+
   }
 
   if(config.debug) {
@@ -103,59 +97,34 @@ async function init()
 
 async function check(parent, currentUrl) {
 
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
 
     if(config.debug) {
       console.log('Checking', currentUrl)
     }
 
-    const stream = m3u8stream(currentUrl, {
-      requestOptions: {
-        maxRetries: config.maxRetries,
-        maxRedirects: config.maxRedirects
-      }
-    })
-
-    setTimeout(function() {
-    
-      stream.end()
+    ffmpeg.ffprobe(currentUrl, function(err, metadata) {
       
-      helper.writeToFile(offlineFile, parent, `Timeout of ${config.timeout}ms exceeded`)
+      if(err) {
 
-      if(config.debug) {
-        console.log(`Error: Timeout of ${config.timeout}ms exceeded`)
+        helper.writeToFile(offlineFile, parent)
+
+        if(config.debug) {
+          console.log(`Error: ${err}`)
+        }
+
+        stats.offline++
+
+      } else {
+
+        helper.writeToFile(onlineFile, parent)
+
+        stats.online++
+
       }
 
-      stats.offline++
-
-      setTimeout(resolve, config.delay)
-    
-    }, config.timeout)
-
-    stream.on('data', (data) => {
-
-      stream.end()
-    
-      helper.writeToFile(onlineFile, parent)
-
-      stats.online++
-
       setTimeout(resolve, config.delay)
 
-    }).on('error', (e) => {
-
-      stream.end()
-
-      helper.writeToFile(offlineFile, parent, e.message)
-
-      if(config.debug) {
-        console.log(`Error: ${e.message}`)
-      }
-
-      stats.offline++
-
-      setTimeout(resolve, config.delay)
-    
     })
 
   })
