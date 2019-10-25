@@ -48,10 +48,27 @@ function writeToFile(path, item, message = null) {
   fs.appendFileSync(path, `${output.join('\n')}\n`)
 }
 
+function parseMessage(err, u) {
+  if(!err || !err.message) return
+
+  const msgArr = err.message.split('\n')
+
+  if(msgArr.length === 0) return
+
+  const line = msgArr.find(line => {
+    return line.indexOf(u) === 0
+  })
+
+  if(!line) return
+
+  return line.replace(`${u}: `, '')
+}
+
 module.exports = {
   parsePlaylist,
   readFile,
   addToCache,
   checkCache,
-  writeToFile
+  writeToFile,
+  parseMessage
 }

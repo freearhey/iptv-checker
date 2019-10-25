@@ -111,10 +111,12 @@ async function check(parent, currentUrl) {
       
       if(err) {
 
-        helper.writeToFile(offlineFile, parent)
+        const message = helper.parseMessage(err, currentUrl)
+
+        helper.writeToFile(offlineFile, parent, message)
 
         if(config.debug) {
-          console.log(err)
+          console.log(message)
         }
 
         stats.offline++
