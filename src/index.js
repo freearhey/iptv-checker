@@ -15,7 +15,7 @@ argv
   .version('0.10.2', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
-  .option('-t, --timeout [timeout]', 'Timeout in seconds', 60)
+  .option('-t, --timeout [timeout]', 'Set the number of milliseconds for each request', 60000)
   .option('--debug', 'Toggle debug mode')
   .action(function (file) {
     seedFile = file
@@ -29,7 +29,11 @@ const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 const config = {
   debug: argv.debug,
-  timeout: argv.timeout
+  timeout: parseInt(parseInt(argv.timeout) / 1000)
+}
+
+if(config.debug) {
+  console.log('Configuration:', config)
 }
 
 try {
