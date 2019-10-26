@@ -23,6 +23,8 @@ http://wanzhoulive.cbg.cn:8017/d4ceB1a/1000/live.m3u8
 #EXTINF:-1 tvg-id="New EPG" tvg-logo="https://i.ytimg.com/vi/caXE8LHBm_4/hqdefault.jpg" tvg-name=" 2monde"  group-title="Morocoo",online
 http://live.setv.sh.cn/slive/shedu02_1200k.m3u8
 
+#EXTINF:-1,offline
+http://c13-ply.janus.cl/playlist/stream.m3u8?s=c13hd
 
 
 =========================sudan===================================
@@ -55,7 +57,7 @@ http://192.99.38.174:1935/litustv/ngrp:litustv_all/playlist.m3u8?GrupoTopIptv
 https://c13014-l-hls.u.core.cdn.streamfarm.net/1000153copo/hk1.m3u8
 #EXTINF:-1,offline
 http://nclive.grtn.cn/tvs2/sd/live.m3u8
-#EXTINF:-1,offline
+#EXTINF:-1,online
 http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
 #EXTINF:-1,online
 https://api.new.livestream.com/accounts/2363281/events/1763520/live.m3u8
