@@ -12,7 +12,7 @@ const ffmpeg = require('fluent-ffmpeg')
 let seedFile
 
 argv
-  .version('0.11.1', '-v, --version')
+  .version('0.11.2', '-v, --version')
   .usage('[options] <file>')
   .option('-o, --output [output]', 'Path to output file')
   .option('-t, --timeout [timeout]', 'Set the number of milliseconds for each request', 60000)
