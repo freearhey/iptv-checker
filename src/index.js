@@ -29,7 +29,7 @@ const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 const config = {
   debug: argv.debug,
-  timeout: parseInt(parseInt(argv.timeout) / 1000)
+  timeout: parseInt(argv.timeout)
 }
 
 if(config.debug) {
@@ -107,7 +107,21 @@ async function check(parent, currentUrl) {
       console.log('Checking', currentUrl)
     }
 
-    ffmpeg(currentUrl, { timeout: config.timeout }).ffprobe(async function(err, metadata) {
+    const timeout = setTimeout(() => {
+      const message = `Timeout exceeded`
+
+      helper.writeToFile(offlineFile, parent, message)
+
+      if(config.debug) {
+        console.log(message)
+      }
+
+      stats.offline++
+
+      resolve()
+    }, config.timeout)
+
+    ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(async function(err, metadata) {
       
       if(err) {
 
@@ -128,6 +142,8 @@ async function check(parent, currentUrl) {
         stats.online++
 
       }
+
+      clearTimeout(timeout)
 
       resolve()
 
