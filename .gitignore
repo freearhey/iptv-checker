@@ -1,3 +1,6 @@
 node_modules
 iptv-checker-*
 output
+.vscode
+auth
+tmp

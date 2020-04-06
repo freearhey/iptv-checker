@@ -1,40 +1,51 @@
 #! /usr/bin/env node
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
-
+require('colors')
 const helper = require('./helper')
-const fs = require("fs")
+const fs = require('fs')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
 const ffmpeg = require('fluent-ffmpeg')
-
+const { version } = require('../package.json')
 let seedFile
 
 argv
-  .version('0.11.2', '-v, --version')
-  .usage('[options] <file>')
-  .option('-o, --output [output]', 'Path to output file')
-  .option('-t, --timeout [timeout]', 'Set the number of milliseconds for each request', 60000)
-  .option('--debug', 'Toggle debug mode')
-  .action(function (file) {
+  .version(version, '-v, --version')
+  .name('iptv-checker')
+  .description(
+    'Utility to check .m3u playlists entries. If no file path or url is provided, this program will attempt to read stdin'
+  )
+  .usage('[options] [file-or-url]')
+  .option('-o, --output [output]', 'Path to output directory')
+  .option(
+    '-t, --timeout [timeout]',
+    'Set the number of milliseconds for each request',
+    60000
+  )
+  .option('-k, --insecure', 'Allow insecure connections when using SSL', false)
+  .option('-d, --debug', 'Toggle debug mode')
+  .action(function (file = null) {
     seedFile = file
   })
   .parse(process.argv)
 
-const outputDir = argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = !+argv.insecure
+
+const outputDir =
+  argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 const config = {
   debug: argv.debug,
-  timeout: parseInt(argv.timeout)
+  timeout: parseInt(argv.timeout),
 }
 
-if(config.debug) {
-  console.log('Configuration:', config)
-}
+const debugLogger = helper.debugLogger(config.debug)
+
+debugLogger('Configuration:', config)
 
 try {
   fs.lstatSync(outputDir)
@@ -51,103 +62,102 @@ let stats = {
   total: 0,
   online: 0,
   offline: 0,
-  duplicates: 0
+  duplicates: 0,
 }
 
 init()
 
-async function init() 
-{
-  console.time('Execution time')
+async function init() {
+  try {
+    console.time('Execution time')
 
-  let playlist = helper.parsePlaylist(seedFile)
+    let playlist = await helper.parsePlaylist(seedFile)
 
-  stats.total = playlist.items.length
-  
-  bar = new ProgressBar(':bar', { total: stats.total })
+    stats.total = playlist.items.length
 
-  for(let item of playlist.items) {
+    bar = new ProgressBar(':bar', { total: stats.total })
 
-    if(!config.debug) {
-      bar.tick()
+    for (let item of playlist.items) {
+      if (!config.debug) {
+        bar.tick()
+      }
+
+      if (!item.url) continue
+
+      if (helper.checkCache(item.url)) {
+        helper.writeToFile(duplicatesFile, item)
+
+        stats.duplicates++
+
+        continue
+      }
+
+      helper.addToCache(item.url)
+
+      await check(item, item.url)
     }
 
-    if(!item.url) continue
-
-    if(helper.checkCache(item.url)) {
-
-      helper.writeToFile(duplicatesFile, item)
-
-      stats.duplicates++
-
-      continue
-
+    if (config.debug) {
+      console.timeEnd('Execution time')
     }
-      
-    helper.addToCache(item.url)
 
-    await check(item, item.url)
+    const result = [
+      `Total: ${stats.total}`,
+      `Online: ${stats.online}`.green,
+      `Offline: ${stats.offline}`.red,
+      `Duplicates: ${stats.duplicates}`.yellow,
+    ].join('\n')
 
+    console.log(result)
+
+    process.exit(0)
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
   }
-
-  if(config.debug) {
-    console.timeEnd('Execution time')
-  }
-
-  console.log(`Total: ${stats.total}. Online: ${stats.online}. Offline: ${stats.offline}. Duplicates: ${stats.duplicates}.`)
-
-  process.exit(0)
 }
 
-async function check(parent, currentUrl) {
+function check(parent, currentUrl) {
+  debugLogger(`Checking ${currentUrl}`.green)
 
-  return new Promise(async (resolve, reject) => {
+  return Promise.race([
+    validateOnline(parent, currentUrl),
+    validateOffline(parent, currentUrl),
+  ])
+}
 
-    if(config.debug) {
-      console.log('Checking', currentUrl)
-    }
+function validateOnline(parent, currentUrl) {
+  return new Promise(resolve => {
+    ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(
+      function (err) {
+        if (err) {
+          const message = String(helper.parseMessage(err, currentUrl)).red
 
-    const timeout = setTimeout(() => {
-      const message = `Timeout exceeded`
+          helper.writeToFile(offlineFile, parent, message)
 
-      helper.writeToFile(offlineFile, parent, message)
+          debugLogger(message.red)
 
-      if(config.debug) {
-        console.log(message)
-      }
+          stats.offline++
+        } else {
+          helper.writeToFile(onlineFile, parent)
 
-      stats.offline++
-
-      resolve()
-    }, config.timeout)
-
-    ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(async function(err, metadata) {
-      
-      if(err) {
-
-        const message = helper.parseMessage(err, currentUrl)
-
-        helper.writeToFile(offlineFile, parent, message)
-
-        if(config.debug) {
-          console.log(message)
+          stats.online++
         }
 
-        stats.offline++
-
-      } else {
-
-        helper.writeToFile(onlineFile, parent)
-
-        stats.online++
-
+        resolve()
       }
+    )
+  })
+}
 
-      clearTimeout(timeout)
+function validateOffline(parent, currentUrl) {
+  return helper.sleep(config.timeout).then(() => {
+    const message = `Timeout exceeded: ${currentUrl}`.yellow
 
-      resolve()
+    helper.writeToFile(offlineFile, parent, message)
 
-    })
+    debugLogger(message)
 
+    stats.offline++
   })
 }
