@@ -1,8 +1,31 @@
+const Axios = require('axios')
 const fs = require('fs')
 const parser = require('iptv-playlist-parser')
 const urlParser = require('url')
+const getStdin = require('get-stdin')
+const { isWebUri } = require('valid-url')
 
 let cache = new Set()
+
+const axios = Axios.create({
+  method: 'GET',
+  timeout: 6e4, // 60 second timeout
+  responseType: 'text',
+  headers: {
+    accept: 'audio/x-mpegurl',
+  },
+})
+
+axios.interceptors.response.use(
+  response => {
+    const { 'content-type': contentType = '' } = response.headers
+    if (contentType !== 'audio/x-mpegurl') {
+      throw new Error('URL is not a .m3u playlist')
+    }
+    return response.data
+  },
+  err => Promise.reject(err)
+)
 
 function getUrlPath(u) {
   let parsedUrl = urlParser.parse(u)
@@ -15,8 +38,15 @@ function readFile(filepath) {
   return fs.readFileSync(filepath, { encoding: 'utf8' })
 }
 
-function parsePlaylist(file) {
-  const content = readFile(file)
+async function parsePlaylist(fileOrUrl) {
+  let content
+  if (!fileOrUrl) {
+    content = await getStdin()
+  } else if (isWebUri(fileOrUrl)) {
+    content = await axios(fileOrUrl)
+  } else {
+    content = readFile(fileOrUrl)
+  }
   const result = parser.parse(content)
 
   return result
