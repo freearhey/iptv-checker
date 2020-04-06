@@ -3,7 +3,7 @@
   "version": "0.11.2",
   "description": "Node.js CLI tool for checking links in IPTV playlists",
   "main": "src/index.js",
-  "preferGlobal": "true",
+  "preferGlobal": true,
   "bin": {
     "iptv-checker": "src/index.js"
   },
