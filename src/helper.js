@@ -20,7 +20,7 @@ axios.interceptors.response.use(
   response => {
     const { 'content-type': contentType = '' } = response.headers
     if (contentType !== 'audio/x-mpegurl') {
-      throw new Error('URL is not a .m3u playlist')
+      throw new Error('URL is not an .m3u playlist file')
     }
     return response.data
   },
@@ -38,9 +38,9 @@ function readFile(filepath) {
   return fs.readFileSync(filepath, { encoding: 'utf8' })
 }
 
-async function parsePlaylist(fileOrUrl) {
+async function parsePlaylist(fileOrUrl = ``) {
   let content
-  if (!fileOrUrl) {
+  if (!fileOrUrl.length) {
     content = await getStdin()
   } else if (isWebUri(fileOrUrl)) {
     content = await axios(fileOrUrl)
@@ -95,9 +95,15 @@ function sleep(ms = 60000) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+const debugLogger = (dbg = false) => {
+  if (!dbg) return () => {}
+  return (...args) => console.log(...args)
+}
+
 module.exports = {
   addToCache,
   checkCache,
+  debugLogger,
   parseMessage,
   parsePlaylist,
   readFile,
