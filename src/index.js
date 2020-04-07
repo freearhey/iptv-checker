@@ -152,11 +152,11 @@ function validateOnline(parent, currentUrl) {
 
 function validateOffline(parent, currentUrl) {
   return helper.sleep(config.timeout).then(() => {
-    const message = `Timeout exceeded: ${currentUrl}`.yellow
+    const message = `Timeout exceeded: ${currentUrl}`
 
     helper.writeToFile(offlineFile, parent, message)
 
-    debugLogger(message)
+    debugLogger(message.yellow)
 
     stats.offline++
   })
