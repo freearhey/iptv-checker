@@ -65,7 +65,7 @@ https://api.new.livestream.com/accounts/2363281/events/1763520/live.m3u8
 http://cstv.live.wscdns.com/live/xiamen1/playlist.m3u8
 #EXTINF:-1,offline
 http://fonte.iptvmaishd.com:25461/1325/1325/102572
-#EXTINF:-1,offline
+#EXTINF:-1,timeout
 http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8
 #EXTINF:-1,duplicate
 http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
