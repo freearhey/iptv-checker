@@ -108,24 +108,30 @@ async function init() {
   }
 }
 
-function processItem(item) {
-  if (!config.debug) {
-    bar.tick()
+const ticker = () => !config.debug && bar.tick()
+
+async function processItem(item, index = 0) {
+  if (!item.url) {
+    return ticker()
   }
 
-  if (!item.url) return
+  /*
+     Add slight delay to ensure cache accuracy
+     when processing channels concurrently
+  */
+  await helper.sleep(index * 100)
 
   if (helper.checkCache(item.url)) {
     helper.writeToFile(duplicatesFile, item)
 
     stats.duplicates++
 
-    return
+    return ticker()
   }
 
   helper.addToCache(item.url)
 
-  return check(item, item.url)
+  await check(item, item.url).then(ticker)
 }
 
 function check(parent, currentUrl) {
@@ -133,25 +139,24 @@ function check(parent, currentUrl) {
   return new Promise(resolve => {
     let timeout = setTimeout(validateOffline, config.timeout)
 
-    ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(
-      function (err) {
-        if (err) {
-          const message = helper.parseMessage(err, currentUrl)
+    ffmpeg(currentUrl, {
+      timeout: parseInt(config.timeout / 1000) + 1,
+    }).ffprobe(err => {
+      if (err) {
+        const message = helper.parseMessage(err, currentUrl)
 
-          helper.writeToFile(offlineFile, parent, message)
+        helper.writeToFile(offlineFile, parent, message)
 
-          debugLogger(`${message}: ${currentUrl}`.red)
+        debugLogger(`${message}: ${currentUrl}`.red)
 
-          stats.offline++
-        } else {
-          helper.writeToFile(onlineFile, parent)
+        stats.offline++
+      } else {
+        helper.writeToFile(onlineFile, parent)
 
-          stats.online++
-        }
-        clearTimeout(timeout)
-        resolve()
+        stats.online++
       }
-    )
+      resolve(clearTimeout(timeout))
+    })
 
     function validateOffline() {
       const message = `Timeout exceeded: ${currentUrl}`.yellow
