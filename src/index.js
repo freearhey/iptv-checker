@@ -68,6 +68,8 @@ let stats = {
 init()
 
 async function init() {
+  debugLogger(`Checking...`)
+
   try {
     console.time('Execution time')
 
@@ -118,8 +120,6 @@ async function init() {
 }
 
 function check(parent, currentUrl) {
-  debugLogger(`Checking ${currentUrl}`.green)
-
   return Promise.race([
     validateOnline(parent, currentUrl),
     validateOffline(parent, currentUrl),
@@ -131,14 +131,16 @@ function validateOnline(parent, currentUrl) {
     ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(
       function (err) {
         if (err) {
-          const message = String(helper.parseMessage(err, currentUrl)).red
+          const message = String(helper.parseMessage(err, currentUrl))
 
           helper.writeToFile(offlineFile, parent, message)
 
-          debugLogger(message.red)
+          debugLogger(`${currentUrl} (${message})`.red)
 
           stats.offline++
         } else {
+          debugLogger(`${currentUrl}`.green)
+
           helper.writeToFile(onlineFile, parent)
 
           stats.online++
@@ -152,11 +154,11 @@ function validateOnline(parent, currentUrl) {
 
 function validateOffline(parent, currentUrl) {
   return helper.sleep(config.timeout).then(() => {
-    const message = `Timeout exceeded: ${currentUrl}`
+    const message = `Timeout exceeded`
 
     helper.writeToFile(offlineFile, parent, message)
 
-    debugLogger(message.yellow)
+    debugLogger(`${currentUrl} (${message})`.yellow)
 
     stats.offline++
   })
