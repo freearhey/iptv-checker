@@ -7,7 +7,9 @@ const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
 const ffmpeg = require('fluent-ffmpeg')
+const chunkify = require('lodash.chunk')
 const { version } = require('../package.json')
+const cores = require('os').cpus().length
 let seedFile
 
 argv
@@ -22,6 +24,11 @@ argv
     '-t, --timeout [timeout]',
     'Set the number of milliseconds for each request',
     60000
+  )
+  .option(
+    '-s, --singular',
+    'Disable parallel processing of multiple channels',
+    false
   )
   .option('-k, --insecure', 'Allow insecure connections when using SSL', false)
   .option('-d, --debug', 'Toggle debug mode')
@@ -79,24 +86,8 @@ async function init() {
 
     bar = new ProgressBar(':bar', { total: stats.total })
 
-    for (let item of playlist.items) {
-      if (!config.debug) {
-        bar.tick()
-      }
-
-      if (!item.url) continue
-
-      if (helper.checkCache(item.url)) {
-        helper.writeToFile(duplicatesFile, item)
-
-        stats.duplicates++
-
-        continue
-      }
-
-      helper.addToCache(item.url)
-
-      await validateStatus(item, item.url)
+    for (let chunk of chunkify(playlist.items, argv.singular ? 1 : cores - 1)) {
+      await Promise.all(chunk.map(processItem))
     }
 
     if (config.debug) {
@@ -119,28 +110,67 @@ async function init() {
   }
 }
 
-function validateStatus(parent, currentUrl) {
+const ticker = () => !config.debug && bar.tick()
+
+async function processItem(item, index = 0) {
+  if (!item.url) {
+    return ticker()
+  }
+
+  /*
+     Add slight delay to ensure cache accuracy
+     when processing channels concurrently
+  */
+  await helper.sleep(index * 100)
+
+  if (helper.checkCache(item.url)) {
+    helper.writeToFile(duplicatesFile, item)
+
+    stats.duplicates++
+
+    return ticker()
+  }
+
+  helper.addToCache(item.url)
+
+  await check(item, item.url).then(ticker)
+}
+
+function check(parent, currentUrl) {
+  debugLogger(`Checking ${currentUrl}`.green)
+  let command, timeout
   return new Promise(resolve => {
-    ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(
-      function (err) {
-        if (err) {
-          const message = String(helper.parseMessage(err, currentUrl))
+    command = ffmpeg(currentUrl, {
+      timeout: parseInt(config.timeout / 1000) + 1,
+    })
 
-          helper.writeToFile(offlineFile, parent, message)
+    command.ffprobe(err => {
+      if (err) {
+        const message = helper.parseMessage(err, currentUrl)
 
-          debugLogger(`${currentUrl} (${message})`.red)
+        helper.writeToFile(offlineFile, parent, message)
 
-          stats.offline++
-        } else {
-          debugLogger(`${currentUrl}`.green)
+        debugLogger(`${message}: ${currentUrl}`.red)
 
-          helper.writeToFile(onlineFile, parent)
+        stats.offline++
+      } else {
+        helper.writeToFile(onlineFile, parent)
 
-          stats.online++
-        }
-
-        resolve()
+        stats.online++
       }
-    )
+      resolve(clearTimeout(timeout))
+    })
+    const validateOffline = () => {
+      const message = `Timeout exceeded: ${currentUrl}`.yellow
+
+      helper.writeToFile(offlineFile, parent, message)
+
+      debugLogger(message)
+
+      stats.offline++
+
+      resolve(command.kill())
+    }
+    timeout = setTimeout(validateOffline, config.timeout)
   })
 }

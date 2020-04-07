@@ -72,7 +72,9 @@ function writeToFile(path, item, message = null) {
     output[0] += ` (${message})`
   }
 
-  fs.appendFileSync(path, `${output.join('\n')}\n`)
+  fs.appendFile(path, `${output.join('\n')}\n`, e => {
+    if (e) console.error(e)
+  })
 }
 
 function parseMessage(err, u) {
