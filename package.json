@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
+    "lint": "./node_modules/.bin/eslint ./src/**/*.js",
     "test": "node test/index.js"
   },
   "publishConfig": {
