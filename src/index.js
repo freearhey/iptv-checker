@@ -96,7 +96,7 @@ async function init() {
 
       helper.addToCache(item.url)
 
-      await check(item, item.url)
+      await validateStatus(item, item.url)
     }
 
     if (config.debug) {
@@ -121,12 +121,12 @@ async function init() {
 
 function check(parent, currentUrl) {
   return Promise.race([
-    validateOnline(parent, currentUrl),
-    validateOffline(parent, currentUrl),
+    validateStatus(parent, currentUrl),
+    validateTimeout(parent, currentUrl),
   ])
 }
 
-function validateOnline(parent, currentUrl) {
+function validateStatus(parent, currentUrl) {
   return new Promise(resolve => {
     ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(
       function (err) {
@@ -152,7 +152,7 @@ function validateOnline(parent, currentUrl) {
   })
 }
 
-function validateOffline(parent, currentUrl) {
+function validateTimeout(parent, currentUrl) {
   return helper.sleep(config.timeout).then(() => {
     const message = `Timeout exceeded`
 
