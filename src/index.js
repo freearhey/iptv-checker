@@ -119,13 +119,6 @@ async function init() {
   }
 }
 
-function check(parent, currentUrl) {
-  return Promise.race([
-    validateStatus(parent, currentUrl),
-    validateTimeout(parent, currentUrl),
-  ])
-}
-
 function validateStatus(parent, currentUrl) {
   return new Promise(resolve => {
     ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(
@@ -149,17 +142,5 @@ function validateStatus(parent, currentUrl) {
         resolve()
       }
     )
-  })
-}
-
-function validateTimeout(parent, currentUrl) {
-  return helper.sleep(config.timeout).then(() => {
-    const message = `Timeout exceeded`
-
-    helper.writeToFile(offlineFile, parent, message)
-
-    debugLogger(`${currentUrl} (${message})`.yellow)
-
-    stats.offline++
   })
 }
