@@ -12,7 +12,8 @@
     "test": "npm-run-all -s test:*",
     "test:file": "node src/index.js -o tmp/file -t 5000 test/dummy.m3u",
     "test:pipe": "cat test/dummy.m3u | node src/index.js -o tmp/pipe -t 5000",
-    "test:url": "node src/index.js -o tmp/url -t 5000 https://iptv-org.github.io/iptv/countries/hk.m3u"
+    "test:url": "node src/index.js -o tmp/url -t 5000 https://iptv-org.github.io/iptv/countries/hk.m3u",
+    "lint": "./node_modules/.bin/eslint ./src/**/*.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

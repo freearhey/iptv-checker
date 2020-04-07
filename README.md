@@ -14,10 +14,18 @@ npm install -g iptv-checker
 
 ## Usage
 
+#### Check local playlist file:
 ```sh
 iptv-checker /path-to-playlist/example.m3u
 ```
-
+#### Check playlist URL:
+```sh
+iptv-checker https://some-playlist.lol/list.m3u
+```
+#### Pipe playlist from `stdin`:
+```sh
+cat ~/some-playlist.m3u | iptv-checker
+```
 Arguments:
 
 - `-o, --output`: change default output directory
