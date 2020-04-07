@@ -136,12 +136,13 @@ async function processItem(item, index = 0) {
 
 function check(parent, currentUrl) {
   debugLogger(`Checking ${currentUrl}`.green)
+  let command, timeout
   return new Promise(resolve => {
-    let timeout = setTimeout(validateOffline, config.timeout)
-
-    ffmpeg(currentUrl, {
+    command = ffmpeg(currentUrl, {
       timeout: parseInt(config.timeout / 1000) + 1,
-    }).ffprobe(err => {
+    })
+
+    command.ffprobe(err => {
       if (err) {
         const message = helper.parseMessage(err, currentUrl)
 
@@ -157,8 +158,7 @@ function check(parent, currentUrl) {
       }
       resolve(clearTimeout(timeout))
     })
-
-    function validateOffline() {
+    const validateOffline = () => {
       const message = `Timeout exceeded: ${currentUrl}`.yellow
 
       helper.writeToFile(offlineFile, parent, message)
@@ -167,7 +167,8 @@ function check(parent, currentUrl) {
 
       stats.offline++
 
-      resolve()
+      resolve(command.kill())
     }
+    timeout = setTimeout(validateOffline, config.timeout)
   })
 }
