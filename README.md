@@ -30,8 +30,7 @@ Arguments:
 
 - `-o, --output`: change default output directory
 - `-t, --timeout`: specifies the number of milliseconds before the request will be aborted (default to 60000)
-- `-s, --singular`: check only one channel at a time (instead of batches of channels in parallel)
-- `-d, --debug`: display verbose channel processing info
+- `-k, --insecure`: allow insecure connections when using SSL
 
 ## Contribution
 
