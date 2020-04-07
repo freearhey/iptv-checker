@@ -108,7 +108,7 @@ async function init() {
       `Duplicates: ${stats.duplicates}`.yellow,
     ].join('\n')
 
-    console.log(result)
+    console.log('\n' + result)
 
     process.exit(0)
   } catch (err) {
