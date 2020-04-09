@@ -17,13 +17,14 @@ argv
     'Utility to check .m3u playlists entries. If no file path or url is provided, this program will attempt to read stdin'
   )
   .usage('[options] [file-or-url]')
-  .option('-o, --output [output]', 'Path to output directory')
+  .option('-o, --output <output>', 'Path to output directory')
   .option(
-    '-t, --timeout [timeout]',
+    '-t, --timeout <timeout>',
     'Set the number of milliseconds for each request',
     60000
   )
-  .option('-k, --insecure', 'Allow insecure connections when using SSL', false)
+  .option('-a, --user-agent <user-agent>', 'Set custom HTTP User-Agent')
+  .option('-k, --insecure', 'Allow insecure connections when using SSL')
   .option('-d, --debug', 'Toggle debug mode')
   .action(function (file = null) {
     seedFile = file
@@ -40,6 +41,8 @@ const duplicatesFile = `${outputDir}/duplicates.m3u`
 
 const config = {
   debug: argv.debug,
+  insecure: argv.insecure,
+  userAgent: argv.userAgent,
   timeout: parseInt(argv.timeout),
 }
 
@@ -121,26 +124,28 @@ async function init() {
 
 function validateStatus(parent, currentUrl) {
   return new Promise(resolve => {
-    ffmpeg(currentUrl, { timeout: parseInt(config.timeout / 1000) }).ffprobe(
-      function (err) {
-        if (err) {
-          const message = String(helper.parseMessage(err, currentUrl))
+    const command = ffmpeg(currentUrl, {
+      timeout: parseInt(config.timeout / 1000),
+    })
 
-          helper.writeToFile(offlineFile, parent, message)
+    command.ffprobe(['-user_agent', `"${config.userAgent}"`], function (err) {
+      if (err) {
+        const message = String(helper.parseMessage(err, currentUrl))
 
-          debugLogger(`${currentUrl} (${message})`.red)
+        helper.writeToFile(offlineFile, parent, message)
 
-          stats.offline++
-        } else {
-          debugLogger(`${currentUrl}`.green)
+        debugLogger(`${currentUrl} (${message})`.red)
 
-          helper.writeToFile(onlineFile, parent)
+        stats.offline++
+      } else {
+        debugLogger(`${currentUrl}`.green)
 
-          stats.online++
-        }
+        helper.writeToFile(onlineFile, parent)
 
-        resolve()
+        stats.online++
       }
-    )
+
+      resolve()
+    })
   })
 }
