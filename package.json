@@ -55,7 +55,7 @@
   "ava": {
     "failFast": true,
     "concurrency": 3,
-    "timeout": "5m",
+    "timeout": "10m",
     "files": [
       "test/*.test.js"
     ]
