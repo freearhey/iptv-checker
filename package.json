@@ -9,8 +9,8 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "lint": "./node_modules/.bin/eslint ./src/**/*.js",
-    "test": "node test/index.js"
+    "lint": "npx eslint ./src/**/*.js ./test/*.js",
+    "test": "npx ava"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -39,14 +39,25 @@
     "valid-url": "^1.0.9"
   },
   "devDependencies": {
+    "ava": "^3.6.0",
     "babel-eslint": "^10.1.0",
+    "del": "^5.1.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "mkdirp": "^1.0.4",
     "prettier": "^2.0.4"
   },
   "engines": {
     "node": ">=10.0.0"
+  },
+  "ava": {
+    "failFast": true,
+    "concurrency": 3,
+    "timeout": "5m",
+    "files": [
+      "test/*.test.js"
+    ]
   }
 }
