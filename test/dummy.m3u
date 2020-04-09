@@ -1,6 +1,12 @@
 
 #EXTM3U x-tvg-url="http://195.154.221.171/epg/guidealbania.xml.gz"
 
+#EXTINF:-1,online [not 24/7]
+https://streaming-live.rtp.pt/livetvhlsDVR/rtpndvr.smil/playlist.m3u8
+#EXTINF:-1,online [not 24/7]
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+https://streaming-live.rtp.pt/liverepeater/smil:rtpi.smil/playlist.m3u8
+
 #EXTINF:-1 tvg-logo="http://logosforapp.ddns.net:25461/images/logo/abu_dhabi_drama.jpg", online
 http://161.0.157.9/PLTV/88888888/224/3221226834/index.m3u8
 #EXTINF:-1,online
@@ -23,7 +29,7 @@ http://wanzhoulive.cbg.cn:8017/d4ceB1a/1000/live.m3u8
 #EXTINF:-1 tvg-id="New EPG" tvg-logo="https://i.ytimg.com/vi/caXE8LHBm_4/hqdefault.jpg" tvg-name=" 2monde"  group-title="Morocoo",online
 http://live.setv.sh.cn/slive/shedu02_1200k.m3u8
 
-#EXTINF:-1,offline
+#EXTINF:-1,online
 http://c13-ply.janus.cl/playlist/stream.m3u8?s=c13hd
 
 
@@ -59,7 +65,7 @@ https://c13014-l-hls.u.core.cdn.streamfarm.net/1000153copo/hk1.m3u8
 http://nclive.grtn.cn/tvs2/sd/live.m3u8
 #EXTINF:-1,online
 http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
-#EXTINF:-1,online
+#EXTINF:-1,offline
 https://api.new.livestream.com/accounts/2363281/events/1763520/live.m3u8
 #EXTINF:-1,offline
 http://cstv.live.wscdns.com/live/xiamen1/playlist.m3u8
@@ -77,5 +83,5 @@ http://190.2.154.164/TV3744
 http://190.2.154.164/TV3745
 #EXTINF:-1,offline
 http://54.180.143.6:9981/stream/channelid/2118383563
-#EXTINF:-1,online
+#EXTINF:-1,offline
 http://173.208.166.179/zan_tv_live_456qwer586_stop_tyui123ikm159-fuck-off/tracks-v1a1/mono.m3u8
