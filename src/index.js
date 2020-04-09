@@ -68,14 +68,14 @@ let stats = {
 init()
 
 async function init() {
-  debugLogger(`Checking...`)
-
   try {
     console.time('Execution time')
 
     let playlist = await helper.parsePlaylist(seedFile)
 
     stats.total = playlist.items.length
+
+    debugLogger(`Checking ${stats.total} items...`)
 
     bar = new ProgressBar(':bar', { total: stats.total })
 
