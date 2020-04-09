@@ -11,8 +11,7 @@ http://161.0.157.9/PLTV/88888888/224/3221226834/index.m3u8
 https://content.uplynk.com/channel/4ee18bd581dc4d3b90303e0cb9beeb0f.m3u8
 #EXTINF:-1  tvg-logo="" group-title="libya ", duplicate
 https://content.uplynk.com/channel/4ee18bd581dc4d3b90303e0cb9beeb0f.m3u8
-#EXTINF:-1,online
-http://livestream.htp.tv/hls-live/livepkgr/_definst_/H1/H1_HQ.m3u8
+
 ================morocco================================================================
 #EXTINF:-1,online
 http://62.67.13.54:1935/sylt1/sylt1_high.stream/chunklist.m3u8
@@ -33,8 +32,6 @@ http://30515.hlsplay.aodianyun.com/lms_30515/tv_channel_239.m3u8
 #EXTINF:-1,online
 https://5a0b00d270652.streamlock.net/live/tvlux-live/chunklist_w167261518.m3u8
 #EXTINF:-1,online
-https://5a0b00d270652.streamlock.net/live/tvcom-live/playlist.m3u8
-#EXTINF:-1,online
 https://backend-server-dot-telearuba-app.appspot.com/media/livestream13/chunklist_w812279767_b1596000_sleng.m3u8
 
 
@@ -47,22 +44,6 @@ https://autoiptv.net
 http://79.106.48.2/live/rtsh_1ott/playlist.m3u8
 #EXTINF:123 tvg-name="" tvg-id="" tvg-logo="https://i.imgur.com/pGGBPBs.png",online
 http://albuk.dyndns.tv:1935/albuk/albuk.stream/playlist.m3u8
-#EXTINF:-1,online
-https://wrclive-f.akamaihd.net/i/wrcb1_1@46880/master.m3u8
-#EXTINF:-1,online
-https://5940924978228.streamlock.net/Directo2/Directo2/master.m3u8
-#EXTINF:-1,online
-http://192.99.38.174:1935/litustv/ngrp:litustv_all/playlist.m3u8?GrupoTopIptv
-#EXTINF:-1,online
-https://c13014-l-hls.u.core.cdn.streamfarm.net/1000153copo/hk1.m3u8
-#EXTINF:-1,offline
-http://nclive.grtn.cn/tvs2/sd/live.m3u8
-#EXTINF:-1,online
-http://rthklive1-lh.akamaihd.net/i/rthk31_1@167495/index_810_av-b.m3u8
-#EXTINF:-1,online
-https://api.new.livestream.com/accounts/2363281/events/1763520/live.m3u8
-#EXTINF:-1,offline
-http://cstv.live.wscdns.com/live/xiamen1/playlist.m3u8
 #EXTINF:-1,offline
 http://fonte.iptvmaishd.com:25461/1325/1325/102572
 #EXTINF:-1,timeout
