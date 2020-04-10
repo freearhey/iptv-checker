@@ -1,0 +1,36 @@
+
+#EXTM3U x-tvg-url="http://195.154.221.171/epg/guidealbania.xml.gz"
+
+#EXTINF:-1,online [not 24/7]
+https://streaming-live.rtp.pt/livetvhlsDVR/rtpndvr.smil/playlist.m3u8
+#EXTINF:-1,online [not 24/7]
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+https://streaming-live.rtp.pt/liverepeater/smil:rtpi.smil/playlist.m3u8
+
+#EXTINF:-1,online
+http://161.0.157.9/PLTV/88888888/224/3221226834/03.m3u8
+#EXTINF:-1,duplicate
+http://161.0.157.9/PLTV/88888888/224/3221226834/index.m3u8
+#EXTINF:-1 tvg-logo="" group-title="libya ",online
+https://content.uplynk.com/channel/4ee18bd581dc4d3b90303e0cb9beeb0f.m3u8
+#EXTINF:-1  tvg-logo="" group-title="libya ", duplicate
+https://content.uplynk.com/channel/4ee18bd581dc4d3b90303e0cb9beeb0f.m3u8
+
+#EXTINF:-1,online
+http://c13-ply.janus.cl/playlist/stream.m3u8?s=c13hd
+
+
+=========================sudan===================================
+#EXTINF:-1,online
+http://30515.hlsplay.aodianyun.com/lms_30515/tv_channel_239.m3u8
+
+
+#EXTM3U
+
+
+#EXTINF:0 group-title="(US) United States",offline
+https://autoiptv.net
+#EXTINF:123 tvg-name="" tvg-id="" tvg-logo="https://i.imgur.com/pGGBPBs.png",online
+http://albuk.dyndns.tv:1935/albuk/albuk.stream/playlist.m3u8
+#EXTINF:-1,timeout
+http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8
