@@ -10,7 +10,7 @@ function resultTester(stdout) {
   })
 }
 
-test.beforeEach(t => {
+test.beforeEach(() => {
   mkdirp.sync(`${pwd}/test/output`)
   del.sync([`${pwd}/test/output/*.m3u`])
 })
