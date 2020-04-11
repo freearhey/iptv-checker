@@ -99,7 +99,9 @@ async function init() {
 
       helper.addToCache(item.url)
 
-      await validateStatus(item, item.url)
+      await validateStatus(item, item.url, {
+        userAgent: item.http['user-agent'],
+      })
     }
 
     if (config.debug) {
@@ -122,13 +124,14 @@ async function init() {
   }
 }
 
-function validateStatus(parent, currentUrl) {
+function validateStatus(parent, currentUrl, options) {
   return new Promise(resolve => {
     const command = ffmpeg(currentUrl, {
       timeout: parseInt(config.timeout / 1000),
     })
 
-    command.ffprobe(['-user_agent', `"${config.userAgent}"`], function (err) {
+    const userAgent = options.userAgent || config.userAgent
+    command.ffprobe(['-user_agent', `"${userAgent}"`], function (err) {
       if (err) {
         const message = String(helper.parseMessage(err, currentUrl))
 
