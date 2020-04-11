@@ -34,7 +34,7 @@
     "dateformat": "^3.0.3",
     "fluent-ffmpeg": "^2.1.2",
     "get-stdin": "^7.0.0",
-    "iptv-playlist-parser": "^0.2.2",
+    "iptv-playlist-parser": "^0.4.0",
     "progress": "^2.0.3",
     "valid-url": "^1.0.9"
   },
