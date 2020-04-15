@@ -8,7 +8,7 @@ script:
   - npm run test
 
 before_install:
-  - sudo apt-get -y --no-install-recommends ffmpeg
+  - sudo apt-get install -y --no-install-recommends ffmpeg
 
 addons:
   apt:
