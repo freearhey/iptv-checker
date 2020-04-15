@@ -4,6 +4,8 @@ const parser = require('iptv-playlist-parser')
 const urlParser = require('url')
 const getStdin = require('get-stdin')
 const { isWebUri } = require('valid-url')
+const util = require('util')
+const execAsync = util.promisify(require('child_process').exec)
 
 let cache = new Set()
 
@@ -49,6 +51,8 @@ async function parsePlaylist(fileOrUrl = ``) {
   }
   const result = parser.parse(content)
 
+  result.items = result.items.filter(i => isWebUri(i.url))
+
   return result
 }
 
@@ -75,29 +79,59 @@ function writeToFile(path, item, message = null) {
   fs.appendFileSync(path, `${output.join('\n')}\n`)
 }
 
-function parseMessage(err, u) {
-  if (!err || !err.message) return
+function parseMessage(reason, url) {
+  if (!reason) return
 
-  const msgArr = err.message.split('\n')
+  const msgArr = reason.split('\n')
 
   if (msgArr.length === 0) return
 
   const line = msgArr.find(line => {
-    return line.indexOf(u) === 0
+    return line.indexOf(url) === 0
   })
 
-  if (!line) return
+  if (!line) {
+    if (/^Command failed/.test(reason)) return `Timed out`
+    return reason
+  }
 
-  return line.replace(`${u}: `, '')
-}
-
-function sleep(ms = 60000) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return line.replace(`${url}: `, '')
 }
 
 const debugLogger = (dbg = false) => {
   if (!dbg) return () => {}
   return (...args) => console.log(...args)
+}
+
+function isJSON(str) {
+  try {
+    return !!JSON.parse(str)
+  } catch (e) {
+    return false
+  }
+}
+
+async function validateItem(item) {
+  const { url } = item
+  const { userAgent, timeout } = this
+  if (!isWebUri(url)) {
+    return { ok: false, reason: `Invalid web URI: ${url}` }
+  }
+
+  return await execAsync(
+    `ffprobe -of json -v error -hide_banner -show_format -show_streams ${
+      userAgent ? `-user_agent "${userAgent}"` : ``
+    } ${url}`,
+    { timeout }
+  )
+    .then(({ stdout }) => {
+      if (!isJSON(stdout)) {
+        return { ok: false, reason: stdout }
+      }
+      const metadata = JSON.parse(stdout)
+      return { ok: true, metadata }
+    })
+    .catch(err => ({ ok: false, reason: err.message }))
 }
 
 module.exports = {
@@ -107,6 +141,6 @@ module.exports = {
   parseMessage,
   parsePlaylist,
   readFile,
-  sleep,
+  validateItem,
   writeToFile,
 }
