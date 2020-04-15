@@ -6,7 +6,6 @@ const fs = require('fs')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
-const ffmpeg = require('fluent-ffmpeg')
 const { version } = require('../package.json')
 let seedFile
 
@@ -78,7 +77,7 @@ async function init() {
 
     stats.total = playlist.items.length
 
-    debugLogger(`Checking ${stats.total} items...`)
+    debugLogger(`Checking ${stats.total} items...`.yellow)
 
     bar = new ProgressBar(':bar', { total: stats.total })
 
@@ -86,8 +85,6 @@ async function init() {
       if (!config.debug) {
         bar.tick()
       }
-
-      if (!item.url) continue
 
       if (helper.checkCache(item.url)) {
         helper.writeToFile(duplicatesFile, item)
@@ -99,9 +96,7 @@ async function init() {
 
       helper.addToCache(item.url)
 
-      await validateStatus(item, item.url, {
-        userAgent: item.http['user-agent'],
-      })
+      await validateStatus(item)
     }
 
     if (config.debug) {
@@ -124,31 +119,22 @@ async function init() {
   }
 }
 
-function validateStatus(parent, currentUrl, options) {
-  return new Promise(resolve => {
-    const command = ffmpeg(currentUrl, {
-      timeout: parseInt(config.timeout / 1000),
-    })
+async function validateStatus(item) {
+  const status = await helper.validateItem.call(config, item)
 
-    const userAgent = options.userAgent || config.userAgent
-    command.ffprobe(['-user_agent', `"${userAgent}"`], function (err) {
-      if (err) {
-        const message = String(helper.parseMessage(err, currentUrl))
+  if (status.ok) {
+    debugLogger(`OK: ${item.url}`.green)
 
-        helper.writeToFile(offlineFile, parent, message)
+    helper.writeToFile(onlineFile, item)
 
-        debugLogger(`${currentUrl} (${message})`.red)
+    stats.online++
+  } else {
+    const message = String(helper.parseMessage(status.reason, item.url))
 
-        stats.offline++
-      } else {
-        debugLogger(`${currentUrl}`.green)
+    helper.writeToFile(offlineFile, item, message)
 
-        helper.writeToFile(onlineFile, parent)
+    debugLogger(`FAILED: ${item.url}`.red + `\n    Reason: ${message}`.yellow)
 
-        stats.online++
-      }
-
-      resolve()
-    })
-  })
+    stats.offline++
+  }
 }
