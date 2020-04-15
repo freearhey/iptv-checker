@@ -51,7 +51,20 @@ async function parsePlaylist(fileOrUrl = ``) {
   }
   const result = parser.parse(content)
 
-  result.items = result.items.filter(i => isWebUri(i.url))
+  result.duplicates = []
+
+  result.items = result.items
+    .filter(i => isWebUri(i.url))
+    .map(i => {
+      if (checkCache(i.url)) {
+        result.duplicates.push(i)
+        return null
+      } else {
+        addToCache(i.url)
+        return i
+      }
+    })
+    .filter(Boolean)
 
   return result
 }
