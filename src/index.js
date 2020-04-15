@@ -75,27 +75,23 @@ async function init() {
 
     let playlist = await helper.parsePlaylist(seedFile)
 
-    stats.total = playlist.items.length
+    stats.total = playlist.items.length + playlist.duplicates.length
 
-    debugLogger(`Checking ${stats.total} items...`.yellow)
+    stats.duplicates = playlist.duplicates.length
+
+    debugLogger(`Checking ${stats.total} items...`)
+    debugLogger(`Found ${stats.duplicates} duplicates...`.yellow)
 
     bar = new ProgressBar(':bar', { total: stats.total })
 
-    for (let item of playlist.items) {
+    for (let item of playlist.duplicates) {
       if (!config.debug) {
         bar.tick()
       }
+      helper.writeToFile(duplicatesFile, item)
+    }
 
-      if (helper.checkCache(item.url)) {
-        helper.writeToFile(duplicatesFile, item)
-
-        stats.duplicates++
-
-        continue
-      }
-
-      helper.addToCache(item.url)
-
+    for (let item of playlist.items) {
       await validateStatus(item)
     }
 
