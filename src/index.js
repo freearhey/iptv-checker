@@ -133,4 +133,8 @@ async function validateStatus(item) {
 
     stats.offline++
   }
+
+  if (!config.debug) {
+    bar.tick()
+  }
 }
