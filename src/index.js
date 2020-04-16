@@ -75,24 +75,18 @@ async function init() {
 
     let playlist = await helper.parsePlaylist(seedFile)
 
-    stats.total = playlist.items.length + playlist.duplicates.length
-
-    stats.duplicates = playlist.duplicates.length
+    stats.total = playlist.items.length
 
     debugLogger(`Checking ${stats.total} items...`)
-    debugLogger(`Found ${stats.duplicates} duplicates...`.yellow)
 
     bar = new ProgressBar(':bar', { total: stats.total })
 
-    for (let item of playlist.duplicates) {
+    for (let item of playlist.items) {
       if (!config.debug) {
         bar.tick()
       }
-      helper.writeToFile(duplicatesFile, item)
-    }
 
-    for (let item of playlist.items) {
-      await validateStatus(item)
+      await validate(item)
     }
 
     if (config.debug) {
@@ -115,26 +109,26 @@ async function init() {
   }
 }
 
-async function validateStatus(item) {
-  const status = await helper.validateItem.call(config, item)
+async function validate(item) {
+  const result = await helper.ffprobe(item, config)
 
-  if (status.ok) {
-    debugLogger(`OK: ${item.url}`.green)
-
+  if (result.status === helper.status.OK) {
     helper.writeToFile(onlineFile, item)
 
+    debugLogger(`${item.url}`.green)
+
     stats.online++
-  } else {
-    const message = String(helper.parseMessage(status.reason, item.url))
+  } else if (result.status === helper.status.DUPLICATE) {
+    helper.writeToFile(duplicatesFile, item)
 
-    helper.writeToFile(offlineFile, item, message)
+    debugLogger(`${item.url} (Duplicate)`.yellow)
 
-    debugLogger(`FAILED: ${item.url}`.red + `\n    Reason: ${message}`.yellow)
+    stats.duplicates++
+  } else if (result.status === helper.status.FAILED) {
+    helper.writeToFile(offlineFile, item, result.message)
+
+    debugLogger(`${item.url} (${result.message})`.red)
 
     stats.offline++
-  }
-
-  if (!config.debug) {
-    bar.tick()
   }
 }
