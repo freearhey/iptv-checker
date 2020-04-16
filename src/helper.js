@@ -5,14 +5,6 @@ const urlParser = require('url')
 const getStdin = require('get-stdin')
 const { isWebUri } = require('valid-url')
 const { exec } = require('child_process')
-const commandExists = require('command-exists')
-
-commandExists(`ffprobe`).catch(() => {
-  console.error(
-    `Executable "ffprobe" not found. Have you installed "ffmpeg"?`.red
-  )
-  process.exit(1)
-})
 
 let cache = new Set()
 

@@ -7,7 +7,16 @@ const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
 const { version } = require('../package.json')
+const commandExists = require('command-exists')
+
 let seedFile
+
+commandExists(`ffprobe`).catch(() => {
+  console.error(
+    `Executable "ffprobe" not found. Have you installed "ffmpeg"?`.red
+  )
+  process.exit(1)
+})
 
 argv
   .version(version, '-v, --version')
