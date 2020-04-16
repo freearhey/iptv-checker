@@ -75,7 +75,7 @@ function writeToFile(path, item, message = null) {
   const extinf = lines[0]
 
   if (message) {
-    lines[0] = extinf + ` (${message})`
+    lines[0] = `${extinf} (${message})`
   }
 
   fs.appendFileSync(path, `${lines.join('\n')}\n`)
@@ -94,14 +94,6 @@ const debugLogger = (dbg = false) => {
   return (...args) => console.log(...args)
 }
 
-function isJSON(str) {
-  try {
-    return !!JSON.parse(str)
-  } catch (e) {
-    return false
-  }
-}
-
 function ffprobe(item, { userAgent, timeout }) {
   return new Promise(resolve => {
     const { url } = item
@@ -118,7 +110,7 @@ function ffprobe(item, { userAgent, timeout }) {
 
     const cmd = `ffprobe -of json -v error -hide_banner -show_format -show_streams -user_agent "${userAgent}" ${url}`
 
-    exec(cmd, { timeout }, (err, stdout) => {
+    exec(cmd, { timeout }, err => {
       if (err) {
         resolve({ status: status.FAILED, message: parseError(err.message) })
       }
