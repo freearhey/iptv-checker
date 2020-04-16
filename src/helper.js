@@ -4,10 +4,15 @@ const parser = require('iptv-playlist-parser')
 const urlParser = require('url')
 const getStdin = require('get-stdin')
 const { isWebUri } = require('valid-url')
-const util = require('util')
-const execAsync = util.promisify(require('child_process').exec)
+const { exec } = require('child_process')
 
 let cache = new Set()
+
+const status = {
+  OK: 0,
+  FAILED: 1,
+  DUPLICATE: 2,
+}
 
 const axios = Axios.create({
   method: 'GET',
@@ -49,24 +54,8 @@ async function parsePlaylist(fileOrUrl = ``) {
   } else {
     content = readFile(fileOrUrl)
   }
-  const result = parser.parse(content)
 
-  result.duplicates = []
-
-  result.items = result.items
-    .filter(i => isWebUri(i.url))
-    .map(i => {
-      if (checkCache(i.url)) {
-        result.duplicates.push(i)
-        return null
-      } else {
-        addToCache(i.url)
-        return i
-      }
-    })
-    .filter(Boolean)
-
-  return result
+  return parser.parse(content)
 }
 
 function addToCache(url) {
@@ -82,33 +71,22 @@ function checkCache(url) {
 }
 
 function writeToFile(path, item, message = null) {
-  const parts = item.raw.split('\n')
-  let output = [parts[0], item.url]
+  const lines = item.raw.split('\n')
+  const extinf = lines[0]
 
   if (message) {
-    output[0] += ` (${message})`
+    lines[0] = extinf + ` (${message})`
   }
 
-  fs.appendFileSync(path, `${output.join('\n')}\n`)
+  fs.appendFileSync(path, `${lines.join('\n')}\n`)
 }
 
-function parseMessage(reason, url) {
-  if (!reason) return
-
-  const msgArr = reason.split('\n')
-
-  if (msgArr.length === 0) return
-
-  const line = msgArr.find(line => {
-    return line.indexOf(url) === 0
-  })
-
-  if (!line) {
-    if (/^Command failed/.test(reason)) return `Timed out`
-    return reason
+function parseError(msg) {
+  if (msg.split('\n').filter(l => l).length > 1) {
+    return msg.split(':').pop().trim()
   }
 
-  return line.replace(`${url}: `, '')
+  return `Timed out`
 }
 
 const debugLogger = (dbg = false) => {
@@ -124,36 +102,36 @@ function isJSON(str) {
   }
 }
 
-async function validateItem(item) {
-  const { url } = item
-  const { userAgent, timeout } = this
-  if (!isWebUri(url)) {
-    return { ok: false, reason: `Invalid web URI: ${url}` }
-  }
+function ffprobe(item, { userAgent, timeout }) {
+  return new Promise(resolve => {
+    const { url } = item
 
-  return await execAsync(
-    `ffprobe -of json -v error -hide_banner -show_format -show_streams ${
-      userAgent ? `-user_agent "${userAgent}"` : ``
-    } ${url}`,
-    { timeout }
-  )
-    .then(({ stdout }) => {
-      if (!isJSON(stdout)) {
-        return { ok: false, reason: stdout }
+    if (!isWebUri(url)) {
+      resolve({ status: status.FAILED, message: `Invalid URL` })
+    }
+
+    if (checkCache(url)) {
+      resolve({ status: status.DUPLICATE })
+    }
+
+    addToCache(url)
+
+    const cmd = `ffprobe -of json -v error -hide_banner -show_format -show_streams -user_agent "${userAgent}" ${url}`
+
+    exec(cmd, { timeout }, (err, stdout) => {
+      if (err) {
+        resolve({ status: status.FAILED, message: parseError(err.message) })
       }
-      const metadata = JSON.parse(stdout)
-      return { ok: true, metadata }
+
+      resolve({ status: status.OK })
     })
-    .catch(err => ({ ok: false, reason: err.message }))
+  })
 }
 
 module.exports = {
-  addToCache,
-  checkCache,
   debugLogger,
-  parseMessage,
   parsePlaylist,
-  readFile,
-  validateItem,
+  ffprobe,
   writeToFile,
+  status,
 }
