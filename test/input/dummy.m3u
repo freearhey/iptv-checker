@@ -4,14 +4,15 @@
 #EXTINF:0 group-title="(US) United States",offline
 https://autoiptv.net
 
+#EXTINF:-1,online [not 24/7]
+https://streaming-live.rtp.pt/livetvhlsDVR/rtpndvr.smil/playlist.m3u8
+
 
 #EXTINF:-1,invalid
 in:valid/30515.hlsplay.aodianyun.com/lms_30515/tv_channel_239.m3u8
 
 
 
-#EXTINF:-1,online [not 24/7]
-https://streaming-live.rtp.pt/livetvhlsDVR/rtpndvr.smil/playlist.m3u8
 #EXTINF:-1,online [not 24/7]
 #EXTVLCOPT:http-user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)
 https://streaming-live.rtp.pt/liverepeater/smil:rtpi.smil/playlist.m3u8
