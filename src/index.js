@@ -91,11 +91,11 @@ async function init() {
     bar = new ProgressBar(':bar', { total: stats.total })
 
     for (let item of playlist.items) {
+      await validate(item)
+
       if (!config.debug) {
         bar.tick()
       }
-
-      await validate(item)
     }
 
     if (config.debug) {
