@@ -55,7 +55,28 @@ async function parsePlaylist(fileOrUrl = ``) {
     content = readFile(fileOrUrl)
   }
 
-  return parser.parse(content)
+  const playlist = parser.parse(content)
+
+  return filterDuplicates(playlist)
+}
+
+function filterDuplicates(playlist) {
+  playlist.duplicates = []
+  const { items } = playlist
+
+  for (let i = 0; i < items.length; i++) {
+    let { url } = items[i]
+    if (checkCache(url)) {
+      playlist.duplicates.push({ ...items[i] })
+      items[i] = null // preserve the index
+      continue
+    }
+    addToCache(url)
+  }
+
+  playlist.items = playlist.items.filter(Boolean) // remove nulled items
+
+  return playlist
 }
 
 function addToCache(url) {
@@ -101,12 +122,6 @@ function ffprobe(item, { userAgent, timeout }) {
     if (!isWebUri(url)) {
       resolve({ status: status.FAILED, message: `Invalid URL` })
     }
-
-    if (checkCache(url)) {
-      resolve({ status: status.DUPLICATE })
-    }
-
-    addToCache(url)
 
     const cmd = `ffprobe -of json -v error -hide_banner -show_format -show_streams -user_agent "${userAgent}" '${url}'`
 
