@@ -84,13 +84,26 @@ async function init() {
 
     let playlist = await helper.parsePlaylist(seedFile)
 
-    stats.total = playlist.items.length
+    const { items, duplicates } = playlist
+
+    stats.total = items.length + duplicates.length
+    stats.duplicates = duplicates.length
 
     debugLogger(`Checking ${stats.total} items...`)
 
     bar = new ProgressBar(':bar', { total: stats.total })
 
-    for (let item of playlist.items) {
+    for (let duplicate of duplicates) {
+      debugLogger(`${duplicate.url} (Duplicate)`.yellow)
+
+      helper.writeToFile(duplicatesFile, duplicate)
+
+      if (!config.debug) {
+        bar.tick()
+      }
+    }
+
+    for (let item of items) {
       await validate(item)
 
       if (!config.debug) {
@@ -127,13 +140,7 @@ async function validate(item) {
     debugLogger(`${item.url}`.green)
 
     stats.online++
-  } else if (result.status === helper.status.DUPLICATE) {
-    helper.writeToFile(duplicatesFile, item)
-
-    debugLogger(`${item.url} (Duplicate)`.yellow)
-
-    stats.duplicates++
-  } else if (result.status === helper.status.FAILED) {
+  } else {
     helper.writeToFile(offlineFile, item, result.message)
 
     debugLogger(`${item.url} (${result.message})`.red)
