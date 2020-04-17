@@ -4,8 +4,15 @@ const parser = require('iptv-playlist-parser')
 const urlParser = require('url')
 const getStdin = require('get-stdin')
 const { isWebUri } = require('valid-url')
+const { exec } = require('child_process')
 
 let cache = new Set()
+
+const status = {
+  OK: 0,
+  FAILED: 1,
+  DUPLICATE: 2,
+}
 
 const axios = Axios.create({
   method: 'GET',
@@ -47,9 +54,8 @@ async function parsePlaylist(fileOrUrl = ``) {
   } else {
     content = readFile(fileOrUrl)
   }
-  const result = parser.parse(content)
 
-  return result
+  return parser.parse(content)
 }
 
 function addToCache(url) {
@@ -65,34 +71,22 @@ function checkCache(url) {
 }
 
 function writeToFile(path, item, message = null) {
-  const parts = item.raw.split('\n')
-  let output = [parts[0], item.url]
+  const lines = item.raw.split('\n')
+  const extinf = lines[0]
 
   if (message) {
-    output[0] += ` (${message})`
+    lines[0] = `${extinf} (${message})`
   }
 
-  fs.appendFileSync(path, `${output.join('\n')}\n`)
+  fs.appendFileSync(path, `${lines.join('\n')}\n`)
 }
 
-function parseMessage(err, u) {
-  if (!err || !err.message) return
+function parseError(msg) {
+  if (msg.split('\n').filter(l => l).length > 1) {
+    return msg.split(':').pop().trim()
+  }
 
-  const msgArr = err.message.split('\n')
-
-  if (msgArr.length === 0) return
-
-  const line = msgArr.find(line => {
-    return line.indexOf(u) === 0
-  })
-
-  if (!line) return
-
-  return line.replace(`${u}: `, '')
-}
-
-function sleep(ms = 60000) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return `Timed out`
 }
 
 const debugLogger = (dbg = false) => {
@@ -100,13 +94,36 @@ const debugLogger = (dbg = false) => {
   return (...args) => console.log(...args)
 }
 
+function ffprobe(item, { userAgent, timeout }) {
+  return new Promise(resolve => {
+    const { url } = item
+
+    if (!isWebUri(url)) {
+      resolve({ status: status.FAILED, message: `Invalid URL` })
+    }
+
+    if (checkCache(url)) {
+      resolve({ status: status.DUPLICATE })
+    }
+
+    addToCache(url)
+
+    const cmd = `ffprobe -of json -v error -hide_banner -show_format -show_streams -user_agent "${userAgent}" '${url}'`
+
+    exec(cmd, { timeout }, err => {
+      if (err) {
+        resolve({ status: status.FAILED, message: parseError(err.message) })
+      }
+
+      resolve({ status: status.OK })
+    })
+  })
+}
+
 module.exports = {
-  addToCache,
-  checkCache,
   debugLogger,
-  parseMessage,
   parsePlaylist,
-  readFile,
-  sleep,
+  ffprobe,
   writeToFile,
+  status,
 }

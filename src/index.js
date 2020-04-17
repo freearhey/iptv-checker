@@ -6,9 +6,17 @@ const fs = require('fs')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
-const ffmpeg = require('fluent-ffmpeg')
 const { version } = require('../package.json')
+const commandExists = require('command-exists')
+
 let seedFile
+
+commandExists(`ffprobe`).catch(() => {
+  console.error(
+    `Executable "ffprobe" not found. Have you installed "ffmpeg"?`.red
+  )
+  process.exit(1)
+})
 
 argv
   .version(version, '-v, --version')
@@ -83,25 +91,11 @@ async function init() {
     bar = new ProgressBar(':bar', { total: stats.total })
 
     for (let item of playlist.items) {
+      await validate(item)
+
       if (!config.debug) {
         bar.tick()
       }
-
-      if (!item.url) continue
-
-      if (helper.checkCache(item.url)) {
-        helper.writeToFile(duplicatesFile, item)
-
-        stats.duplicates++
-
-        continue
-      }
-
-      helper.addToCache(item.url)
-
-      await validateStatus(item, item.url, {
-        userAgent: item.http['user-agent'],
-      })
     }
 
     if (config.debug) {
@@ -124,31 +118,26 @@ async function init() {
   }
 }
 
-function validateStatus(parent, currentUrl, options) {
-  return new Promise(resolve => {
-    const command = ffmpeg(currentUrl, {
-      timeout: parseInt(config.timeout / 1000),
-    })
+async function validate(item) {
+  const result = await helper.ffprobe(item, config)
 
-    const userAgent = options.userAgent || config.userAgent
-    command.ffprobe(['-user_agent', `"${userAgent}"`], function (err) {
-      if (err) {
-        const message = String(helper.parseMessage(err, currentUrl))
+  if (result.status === helper.status.OK) {
+    helper.writeToFile(onlineFile, item)
 
-        helper.writeToFile(offlineFile, parent, message)
+    debugLogger(`${item.url}`.green)
 
-        debugLogger(`${currentUrl} (${message})`.red)
+    stats.online++
+  } else if (result.status === helper.status.DUPLICATE) {
+    helper.writeToFile(duplicatesFile, item)
 
-        stats.offline++
-      } else {
-        debugLogger(`${currentUrl}`.green)
+    debugLogger(`${item.url} (Duplicate)`.yellow)
 
-        helper.writeToFile(onlineFile, parent)
+    stats.duplicates++
+  } else if (result.status === helper.status.FAILED) {
+    helper.writeToFile(offlineFile, item, result.message)
 
-        stats.online++
-      }
+    debugLogger(`${item.url} (${result.message})`.red)
 
-      resolve()
-    })
-  })
+    stats.offline++
+  }
 }
