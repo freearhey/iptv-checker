@@ -50,7 +50,7 @@ const duplicatesFile = `${outputDir}/duplicates.m3u`
 const config = {
   debug: argv.debug,
   insecure: argv.insecure,
-  userAgent: argv.userAgent,
+  userAgent: argv.userAgent || `IPTVChecker/${version}`,
   timeout: parseInt(argv.timeout),
 }
 
