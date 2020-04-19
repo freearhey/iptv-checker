@@ -108,7 +108,18 @@ function ffprobe(item, { userAgent, timeout }) {
 
     addToCache(url)
 
-    const cmd = `ffprobe -of json -v error -hide_banner -show_format -show_streams -user_agent "${userAgent}" '${url}'`
+    /*
+      ! Wrap ALL user input in single-quotes to prevent shell injection attacks!
+    */
+    const cmd = [
+      `ffprobe`,
+      `-v`,
+      `error`,
+      `-hide_banner`,
+      `-user_agent`,
+      `'${userAgent}'`,
+      `'${url}'`,
+    ].join(` `)
 
     exec(cmd, { timeout }, err => {
       if (err) {
