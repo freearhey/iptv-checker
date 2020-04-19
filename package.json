@@ -4,6 +4,7 @@
   "description": "Node.js CLI tool for checking links in IPTV playlists",
   "main": "src/index.js",
   "preferGlobal": true,
+  "homepage": "https://github.com/freearhey/iptv-checker#readme",
   "bin": {
     "iptv-checker": "src/index.js"
   },

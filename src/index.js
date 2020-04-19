@@ -6,7 +6,7 @@ const fs = require('fs')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
-const { version } = require('../package.json')
+const { version, homepage } = require('../package.json')
 const commandExists = require('command-exists')
 
 let seedFile
@@ -47,10 +47,12 @@ const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
 
+const defaultUserAgent = `IPTVChecker/${version} (${homepage})`
+
 const config = {
   debug: argv.debug,
   insecure: argv.insecure,
-  userAgent: argv.userAgent || `IPTVChecker/${version}`,
+  userAgent: argv.userAgent || defaultUserAgent,
   timeout: parseInt(argv.timeout),
 }
 
