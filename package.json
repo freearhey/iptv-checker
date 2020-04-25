@@ -35,7 +35,7 @@
     "commander": "^2.20.0",
     "dateformat": "^3.0.3",
     "get-stdin": "^7.0.0",
-    "iptv-playlist-parser": "^0.4.1",
+    "iptv-playlist-parser": "^0.4.2",
     "progress": "^2.0.3",
     "valid-url": "^1.0.9"
   },
