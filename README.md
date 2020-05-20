@@ -38,6 +38,7 @@ Arguments:
 - `-t, --timeout`: specifies the number of milliseconds before the request will be aborted (default to 60000)
 - `-a, --user-agent`: set custom HTTP User-Agent
 - `-k, --insecure`: allow insecure connections when using SSL
+- `-p, --parallel`: Batch size of channels to check concurrently (default to 1)
 
 ## Contribution
 
