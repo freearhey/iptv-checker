@@ -1,22 +1,15 @@
 #! /usr/bin/env node
 
 require('colors')
-const helper = require('./helper')
+const playlistChecker = require('iptv-checker-module')
 const fs = require('fs')
+const getStdin = require('get-stdin')
 const argv = require('commander')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
 const { version, homepage } = require('../package.json')
-const commandExists = require('command-exists')
 
 let seedFile
-
-commandExists(`ffprobe`).catch(() => {
-  console.error(
-    `Executable "ffprobe" not found. Have you installed "ffmpeg"?`.red
-  )
-  process.exit(1)
-})
 
 argv
   .version(version, '-v, --version')
@@ -30,6 +23,11 @@ argv
     '-t, --timeout <timeout>',
     'Set the number of milliseconds for each request',
     60000
+  )
+  .option(
+    '-p, --parallel <number>',
+    'Batch size of items to check concurrently',
+    1
   )
   .option('-a, --user-agent <user-agent>', 'Set custom HTTP User-Agent')
   .option('-k, --insecure', 'Allow insecure connections when using SSL')
@@ -54,11 +52,10 @@ const config = {
   insecure: argv.insecure,
   userAgent: argv.userAgent || defaultUserAgent,
   timeout: parseInt(argv.timeout),
+  parallel: +argv.parallel,
+  itemCallback: validate,
+  preCheckAction: preCheck,
 }
-
-const debugLogger = helper.debugLogger(config.debug)
-
-debugLogger('Configuration:', config)
 
 try {
   fs.lstatSync(outputDir)
@@ -82,27 +79,19 @@ init()
 
 async function init() {
   try {
-    console.time('Execution time')
+    if (!seedFile || !seedFile.length) seedFile = await getStdin()
 
-    let playlist = await helper.parsePlaylist(seedFile)
+    const checkedList = await playlistChecker(seedFile, config)
 
-    stats.total = playlist.items.length
+    stats.online = checkedList.items.filter(item => item.status.ok).length
 
-    debugLogger(`Checking ${stats.total} items...`)
+    stats.offline = checkedList.items.filter(
+      item => !item.status.ok && item.status.reason !== `Duplicate`
+    ).length
 
-    bar = new ProgressBar(':bar', { total: stats.total })
-
-    for (let item of playlist.items) {
-      await validate(item)
-
-      if (!config.debug) {
-        bar.tick()
-      }
-    }
-
-    if (config.debug) {
-      console.timeEnd('Execution time')
-    }
+    stats.duplicates = checkedList.items.filter(
+      item => !item.status.ok && item.status.reason === `Duplicate`
+    ).length
 
     const result = [
       `Total: ${stats.total}`,
@@ -120,26 +109,32 @@ async function init() {
   }
 }
 
-async function validate(item) {
-  const result = await helper.ffprobe(item, config)
-
-  if (result.status === helper.status.OK) {
-    helper.writeToFile(onlineFile, item)
-
-    debugLogger(`${item.url}`.green)
-
-    stats.online++
-  } else if (result.status === helper.status.DUPLICATE) {
-    helper.writeToFile(duplicatesFile, item)
-
-    debugLogger(`${item.url} (Duplicate)`.yellow)
-
-    stats.duplicates++
-  } else if (result.status === helper.status.FAILED) {
-    helper.writeToFile(offlineFile, item, result.message)
-
-    debugLogger(`${item.url} (${result.message})`.red)
-
-    stats.offline++
+function validate(item) {
+  if (item.status.ok) {
+    writeToFile(onlineFile, item)
+  } else if (item.status.reason === `Duplicate`) {
+    writeToFile(duplicatesFile, item)
+  } else {
+    writeToFile(offlineFile, item, item.status.reason)
   }
+
+  if (!config.debug) {
+    bar.tick()
+  }
+}
+
+function preCheck(playlist) {
+  stats.total = playlist.items.length
+  bar = new ProgressBar(':bar', { total: stats.total })
+}
+
+function writeToFile(path, item, message = null) {
+  const lines = item.raw.split('\n')
+  const extinf = lines[0]
+
+  if (message) {
+    lines[0] = `${extinf} (${message})`
+  }
+
+  fs.appendFileSync(path, `${lines.join('\n')}\n`)
 }
