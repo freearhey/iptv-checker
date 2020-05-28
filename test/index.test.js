@@ -32,7 +32,7 @@ test.serial(`Should process a local playlist file`, t => {
 })
 
 test.serial(`Should process a playlist URL`, t => {
-  const url = 'https://iptv-org.github.io/iptv/categories/classic.m3u'
+  const url = 'https://iptv-org.github.io/iptv/categories/auto.m3u'
   const result = execSync(
     `node ${pwd}/src/index.js -t 1000 -o ${pwd}/test/output ${url}`
   )
