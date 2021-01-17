@@ -33,7 +33,7 @@
     "commander": "^2.20.0",
     "dateformat": "^3.0.3",
     "get-stdin": "^7.0.0",
-    "iptv-checker-module": "^2.0.1",
+    "iptv-checker-module": "^2.0.3",
     "progress": "^2.0.3"
   },
   "devDependencies": {
