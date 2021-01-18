@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node src/index.js",
     "lint": "npx eslint ./src/**/*.js ./test/*.js",
-    "test": "npx ava"
+    "test": "npx ava --serial"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -29,6 +29,7 @@
     "checker"
   ],
   "dependencies": {
+    "ava": "^3.15.0",
     "colors": "^1.4.0",
     "commander": "^2.20.0",
     "dateformat": "^3.0.3",
@@ -37,7 +38,6 @@
     "progress": "^2.0.3"
   },
   "devDependencies": {
-    "ava": "^3.6.0",
     "babel-eslint": "^10.1.0",
     "del": "^5.1.0",
     "eslint": "^6.8.0",
