@@ -15,7 +15,7 @@ test.beforeEach(() => {
   del.sync([`${pwd}/test/output/*.m3u`])
 })
 
-test.serial(`Should process playlist piped from stdin`, t => {
+test(`Should process playlist piped from stdin`, t => {
   const result = execSync(
     `cat ${pwd}/test/input/example.m3u | node ${pwd}/src/index.js -t 1000 -o ${pwd}/test/output`
   )
@@ -23,18 +23,18 @@ test.serial(`Should process playlist piped from stdin`, t => {
   t.true(resultTester(result))
 })
 
-test.serial(`Should process a local playlist file`, t => {
+test(`Should process a playlist URL`, t => {
+  const url = 'https://iptv-org.github.io/iptv/categories/auto.m3u'
   const result = execSync(
-    `node ${pwd}/src/index.js -t 1000 -o ${pwd}/test/output ${pwd}/test/input/example.m3u`
+    `node ${pwd}/src/index.js -t 1000 -o ${pwd}/test/output ${url}`
   )
 
   t.true(resultTester(result))
 })
 
-test.serial(`Should process a playlist URL`, t => {
-  const url = 'https://iptv-org.github.io/iptv/categories/auto.m3u'
+test(`Should process a local playlist file`, t => {
   const result = execSync(
-    `node ${pwd}/src/index.js -t 1000 -o ${pwd}/test/output ${url}`
+    `node ${pwd}/src/index.js -t 1000 -o ${pwd}/test/output ${pwd}/test/input/example.m3u`
   )
 
   t.true(resultTester(result))
