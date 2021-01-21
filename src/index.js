@@ -1,73 +1,10 @@
-#! /usr/bin/env node
-
 require('colors')
-const playlistChecker = require('iptv-checker-module')
-const fs = require('fs')
-const getStdin = require('get-stdin')
-const argv = require('commander')
-const ProgressBar = require('progress')
-const dateFormat = require('dateformat')
-const { version, homepage } = require('../package.json')
+const helper = require('./helper')
+const { isWebUri } = require('valid-url')
+const commandExists = require('command-exists')
 
-let seedFile
+const procs = require('os').cpus().length - 1
 
-argv
-  .version(version, '-v, --version')
-  .name('iptv-checker')
-  .description(
-    'Utility to check .m3u playlists entries. If no file path or url is provided, this program will attempt to read stdin'
-  )
-  .usage('[options] [file-or-url]')
-  .option('-o, --output <output>', 'Path to output directory')
-  .option(
-    '-t, --timeout <timeout>',
-    'Set the number of milliseconds for each request',
-    60000
-  )
-  .option(
-    '-p, --parallel <number>',
-    'Batch size of items to check concurrently',
-    1
-  )
-  .option('-a, --user-agent <user-agent>', 'Set custom HTTP User-Agent')
-  .option('-k, --insecure', 'Allow insecure connections when using SSL')
-  .option('-d, --debug', 'Toggle debug mode')
-  .action(function (file = null) {
-    seedFile = file
-  })
-  .parse(process.argv)
-
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = !+argv.insecure
-
-const outputDir =
-  argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const onlineFile = `${outputDir}/online.m3u`
-const offlineFile = `${outputDir}/offline.m3u`
-const duplicatesFile = `${outputDir}/duplicates.m3u`
-
-const defaultUserAgent = `IPTVChecker/${version} (${homepage})`
-
-const config = {
-  debug: argv.debug,
-  insecure: argv.insecure,
-  userAgent: argv.userAgent || defaultUserAgent,
-  timeout: parseInt(argv.timeout),
-  parallel: +argv.parallel,
-  itemCallback: validate,
-  preCheckAction: preCheck,
-}
-
-try {
-  fs.lstatSync(outputDir)
-} catch (e) {
-  fs.mkdirSync(outputDir)
-}
-
-fs.writeFileSync(onlineFile, '#EXTM3U\n')
-fs.writeFileSync(offlineFile, '#EXTM3U\n')
-fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
-
-let bar
 let stats = {
   total: 0,
   online: 0,
@@ -75,66 +12,96 @@ let stats = {
   duplicates: 0,
 }
 
-init()
-
-async function init() {
-  try {
-    if (!seedFile || !seedFile.length) seedFile = await getStdin()
-
-    const checkedList = await playlistChecker(seedFile, config)
-
-    stats.online = checkedList.items.filter(item => item.status.ok).length
-
-    stats.offline = checkedList.items.filter(
-      item => !item.status.ok && item.status.reason !== `Duplicate`
-    ).length
-
-    stats.duplicates = checkedList.items.filter(
-      item => !item.status.ok && item.status.reason === `Duplicate`
-    ).length
-
-    const result = [
-      `Total: ${stats.total}`,
-      `Online: ${stats.online}`.green,
-      `Offline: ${stats.offline}`.red,
-      `Duplicates: ${stats.duplicates}`.yellow,
-    ].join('\n')
-
-    console.log(`\n${result}`)
-
-    process.exit(0)
-  } catch (err) {
-    console.error(err)
-    process.exit(1)
-  }
+const defaultConfig = {
+  debug: false,
+  userAgent: null,
+  timeout: 10000,
+  parallel: procs || 1,
+  omitMetadata: false,
+  useItemHttpHeaders: true,
+  preCheckAction: parsedPlaylist => {}, // eslint-disable-line
+  itemCallback: item => {}, // eslint-disable-line
 }
 
-function validate(item) {
-  if (item.status.ok) {
-    writeToFile(onlineFile, item)
-  } else if (item.status.reason === `Duplicate`) {
-    writeToFile(duplicatesFile, item)
+module.exports = async function (input, opts = {}) {
+  await commandExists(`ffprobe`).catch(() => {
+    throw new Error(
+      `Executable "ffprobe" not found. Have you installed "ffmpeg"?`
+    )
+  })
+
+  const results = []
+  const duplicates = []
+  const config = { ...defaultConfig, ...opts }
+  const playlist = await helper.parsePlaylist(input)
+  const debugLogger = helper.debugLogger(config)
+
+  debugLogger(config)
+
+  const items = playlist.items
+    .map(item => {
+      if (!isWebUri(item.url)) return null
+
+      if (helper.checkCache(item)) {
+        duplicates.push(item)
+
+        return null
+      } else {
+        helper.addToCache(item)
+
+        return item
+      }
+    })
+    .filter(Boolean)
+
+  await config.preCheckAction.call(null, {
+    ...playlist,
+    items: [...items, ...duplicates],
+  })
+
+  stats.total = items.length + duplicates.length
+
+  stats.duplicates = duplicates.length
+
+  debugLogger(`Checking ${stats.total} playlist items...`)
+
+  if (duplicates.length)
+    debugLogger(`Found ${stats.duplicates} duplicates...`.yellow)
+
+  for (let item of duplicates) {
+    item.status = { ok: false, reason: `Duplicate` }
+    await config.itemCallback(item)
+    results.push(item)
+  }
+
+  const ctx = { config, stats, debugLogger }
+
+  const validator = helper.validateStatus.bind(ctx)
+
+  if (+config.parallel === 1) {
+    for (let item of items) {
+      const checkedItem = await validator(item)
+
+      results.push(checkedItem)
+    }
   } else {
-    writeToFile(offlineFile, item, item.status.reason)
+    const chunkedItems = helper.chunk(items, +config.parallel)
+
+    for (let [...chunk] of chunkedItems) {
+      const chunkResults = await Promise.all(chunk.map(validator))
+      results.push(...chunkResults)
+    }
   }
 
-  if (!config.debug) {
-    bar.tick()
-  }
-}
+  playlist.items = helper.orderBy(results, [`name`])
 
-function preCheck(playlist) {
-  stats.total = playlist.items.length
-  bar = new ProgressBar(':bar', { total: stats.total })
-}
-
-function writeToFile(path, item, message = null) {
-  const lines = item.raw.split('\n')
-  const extinf = lines[0]
-
-  if (message) {
-    lines[0] = `${extinf.trim()} (${message})`
+  if (config.omitMetadata) {
+    for (let item of playlist.items) {
+      delete item.status.metadata
+    }
   }
 
-  fs.appendFileSync(path, `${lines.join('\n')}\n`)
+  helper.statsLogger(ctx)
+
+  return playlist
 }
