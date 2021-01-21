@@ -1,6 +1,6 @@
 {
   "name": "iptv-checker",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Node.js CLI tool for checking links in IPTV playlists",
   "main": "src/index.js",
   "preferGlobal": true,
