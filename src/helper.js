@@ -27,7 +27,7 @@ axios.interceptors.response.use(
     }
     return response.data
   },
-  error => {
+  () => {
     let msg = `Error fetching playlist`
 
     return Promise.reject(new Error(msg))
