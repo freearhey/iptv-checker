@@ -125,7 +125,9 @@ function validate(item) {
 
 function preCheck(playlist) {
   stats.total = playlist.items.length
-  bar = new ProgressBar(':bar', { total: stats.total })
+  bar = new ProgressBar('[:bar] :current/:total (:percent) ', {
+    total: stats.total,
+  })
 }
 
 function writeToFile(path, item, message = null) {
