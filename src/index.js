@@ -15,7 +15,7 @@ let stats = {
 const defaultConfig = {
   debug: false,
   userAgent: null,
-  timeout: 10000,
+  timeout: 60000,
   parallel: procs || 1,
   omitMetadata: false,
   useItemHttpHeaders: true,
