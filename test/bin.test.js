@@ -1,7 +1,6 @@
 const { execSync } = require('child_process')
 const mkdirp = require('mkdirp')
 const del = require('del')
-const test = require('ava')
 const pwd = `${__dirname}/..`
 
 function stdoutResultTester(stdout) {
@@ -10,32 +9,35 @@ function stdoutResultTester(stdout) {
   })
 }
 
-test.beforeEach(() => {
+beforeEach(() => {
   mkdirp.sync(`${pwd}/test/output`)
   del.sync([`${pwd}/test/output/*.m3u`])
 })
 
-test(`Should process playlist piped from stdin`, t => {
+test(`Should process playlist piped from stdin`, () => {
   const result = execSync(
-    `cat ${pwd}/test/input/example.m3u | node ${pwd}/bin/iptv-checker.js -t 1000 -o ${pwd}/test/output`
+    `cat ${pwd}/test/input/example.m3u | node ${pwd}/bin/iptv-checker.js -t 1000 -o ${pwd}/test/output`,
+    { encoding: 'utf8' }
   )
 
-  t.true(stdoutResultTester(result))
+  expect(stdoutResultTester(result)).toBeTruthy()
 })
 
-test(`Should process a local playlist file`, t => {
+test(`Should process a local playlist file`, () => {
   const result = execSync(
-    `node ${pwd}/bin/iptv-checker.js -t 1000 -o ${pwd}/test/output ${pwd}/test/input/example.m3u`
+    `node ${pwd}/bin/iptv-checker.js -t 1000 -o ${pwd}/test/output ${pwd}/test/input/example.m3u`,
+    { encoding: 'utf8' }
   )
 
-  t.true(stdoutResultTester(result))
+  expect(stdoutResultTester(result)).toBeTruthy()
 })
 
-test(`Should process a playlist URL`, t => {
+test(`Should process a playlist URL`, () => {
   const url = 'https://iptv-org.github.io/iptv/categories/culture.m3u'
   const result = execSync(
-    `node ${pwd}/bin/iptv-checker.js -t 1000 -o ${pwd}/test/output ${url}`
+    `node ${pwd}/bin/iptv-checker.js -t 1000 -o ${pwd}/test/output ${url}`,
+    { encoding: 'utf8' }
   )
 
-  t.true(stdoutResultTester(result))
+  expect(stdoutResultTester(result)).toBeTruthy()
 })
