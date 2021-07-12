@@ -32,7 +32,7 @@ test(`Should process a local playlist file`, t => {
 })
 
 test(`Should process a playlist URL`, t => {
-  const url = 'https://iptv-org.github.io/iptv/categories/comedy.m3u'
+  const url = 'https://iptv-org.github.io/iptv/categories/culture.m3u'
   const result = execSync(
     `node ${pwd}/bin/iptv-checker.js -t 1000 -o ${pwd}/test/output ${url}`
   )
