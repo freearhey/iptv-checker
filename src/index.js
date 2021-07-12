@@ -1,7 +1,8 @@
 require('colors')
 const helper = require('./helper')
-const { isWebUri } = require('valid-url')
+const { isUri, isWebUri } = require('valid-url')
 const commandExists = require('command-exists')
+const { existsSync } = require('fs')
 
 const procs = require('os').cpus().length - 1
 
@@ -30,6 +31,14 @@ module.exports = async function (input, opts = {}) {
     )
   })
 
+  if (
+    !(input instanceof Object) &&
+    !Buffer.isBuffer(input) &&
+    typeof input !== `string`
+  ) {
+    throw new Error('Unsupported input type')
+  }
+
   const results = []
   const duplicates = []
   const config = { ...defaultConfig, ...opts }
@@ -40,7 +49,7 @@ module.exports = async function (input, opts = {}) {
 
   const items = playlist.items
     .map(item => {
-      if (!isWebUri(item.url)) return null
+      if (!isUri(item.url)) return null
 
       if (helper.checkCache(item)) {
         duplicates.push(item)
