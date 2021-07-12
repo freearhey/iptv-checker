@@ -1,8 +1,7 @@
 require('colors')
 const helper = require('./helper')
-const { isUri, isWebUri } = require('valid-url')
+const { isUri } = require('valid-url')
 const commandExists = require('command-exists')
-const { existsSync } = require('fs')
 
 const procs = require('os').cpus().length - 1
 
