@@ -1,5 +1,4 @@
 const Axios = require('axios')
-const { customAlphabet } = require('nanoid')
 const util = require('util')
 const { parse } = require('iptv-playlist-parser')
 const { isWebUri } = require('valid-url')
@@ -7,11 +6,6 @@ const { existsSync, readFile } = require('fs')
 
 const execAsync = util.promisify(require('child_process').exec)
 const readFileAsync = util.promisify(readFile)
-
-const nanoid = customAlphabet(
-  '1234567890abcdefghijklmnopqrstuvwxyz'.toUpperCase(),
-  6
-)
 
 const axios = Axios.create({
   method: 'GET',
@@ -161,7 +155,7 @@ function checkItem(item) {
 
   args = args.join(` `)
 
-  debugLogger(`[${item.uid}] EXECUTING: "${args}"`)
+  debugLogger(`EXECUTING: "${args}"`)
 
   return execAsync(args, { timeout })
     .then(({ stdout }) => {
@@ -175,22 +169,17 @@ function checkItem(item) {
 }
 
 async function validateStatus(item) {
-  if (this.config.debug) item.uid = nanoid()
-
   item.status = await checkItem.call(this, item)
 
   if (item.status.ok) {
     this.stats.online++
-    this.debugLogger(`[${item.uid}] OK: ${item.url}`.green)
+    this.debugLogger(`OK: ${item.url}`.green)
   } else {
     this.stats.offline++
     this.debugLogger(
-      `[${item.uid}] FAILED: ${item.url}`.red +
-        ` (${item.status.reason})`.yellow
+      `FAILED: ${item.url}`.red + ` (${item.status.reason})`.yellow
     )
   }
-
-  delete item.uid
 
   await this.config.itemCallback.call(null, item)
 

@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node src/index.js",
     "lint": "npx eslint ./src/**/*.js ./test/*.js",
-    "test": "npx ava --serial",
+    "test": "npx jest",
     "prePush": "npm-run-all -p lint test"
   },
   "publishConfig": {
@@ -30,7 +30,6 @@
     "checker"
   ],
   "dependencies": {
-    "ava": "^3.15.0",
     "axios": "^0.21.1",
     "colors": "^1.4.0",
     "command-exists": "^1.2.9",
@@ -38,7 +37,7 @@
     "dateformat": "^3.0.3",
     "get-stdin": "^7.0.0",
     "iptv-playlist-parser": "^0.5.4",
-    "nanoid": "^3.1.20",
+    "jest": "^27.0.6",
     "progress": "^2.0.3",
     "valid-url": "^1.0.9"
   },
