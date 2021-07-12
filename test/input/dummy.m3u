@@ -1,6 +1,9 @@
 
 #EXTM3U x-tvg-url="http://195.154.221.171/epg/guidealbania.xml.gz"
 
+#EXTINF:0,rtp://239.193.132.161:1234
+rtp://@239.193.132.161:1234
+
 #EXTINF:0 group-title="(US) United States",offline
 https://autoiptv.net
 
