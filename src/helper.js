@@ -135,7 +135,6 @@ function checkItem(item) {
     `-of json`,
     `-v error`,
     `-hide_banner`,
-    `-show_format`,
     `-show_streams`,
   ]
 
@@ -163,6 +162,8 @@ function checkItem(item) {
         return { ok: false, reason: parseMessage(stdout, item) }
       }
       const metadata = JSON.parse(stdout)
+      if (!metadata.streams.length)
+        return { ok: false, reason: 'No working streams' }
       return { ok: true, metadata }
     })
     .catch(err => ({ ok: false, reason: parseMessage(err.message, item) }))
