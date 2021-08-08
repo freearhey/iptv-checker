@@ -83,16 +83,6 @@ function parseMessage(reason, { url }) {
   return line.replace(`${url}: `, '')
 }
 
-function debugLogger({ debug }) {
-  let envDebug = /iptv-checker-module/.test(String(process.env.DEBUG))
-  if (!debug && !envDebug) return () => {}
-  return msg => {
-    if (typeof msg === `object`) {
-      return console.log(JSON.stringify(msg, null, 1))
-    } else console.log(msg)
-  }
-}
-
 function isJSON(str) {
   try {
     return !!JSON.parse(str)
@@ -101,34 +91,10 @@ function isJSON(str) {
   }
 }
 
-function chunk(arr, size) {
-  return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
-    arr.slice(i * size, i * size + size)
-  )
-}
-
-function orderBy(arr, props, orders) {
-  return [...arr].sort((a, b) =>
-    props.reduce((acc, prop, i) => {
-      if (acc === 0) {
-        const [p1, p2] =
-          orders && orders[i] === 'desc'
-            ? [b[prop], a[prop]]
-            : [a[prop], b[prop]]
-        acc = p1 > p2 ? 1 : p1 < p2 ? -1 : 0
-      }
-      return acc
-    }, 0)
-  )
-}
-
 function checkItem(item) {
   const { url, http = {} } = item
   let { referrer = ``, 'user-agent': itemUserAgent = `` } = http
-  let {
-    config: { userAgent, timeout, useItemHttpHeaders },
-    debugLogger,
-  } = this
+  const { config, logger } = this
 
   let args = [
     `ffprobe`,
@@ -138,12 +104,9 @@ function checkItem(item) {
     `-show_streams`,
   ]
 
-  /* ! Single-quote wrap all user input to prevent shell injection attacks */
-  if (useItemHttpHeaders) {
-    userAgent = itemUserAgent.length ? itemUserAgent : userAgent
-    if (referrer.length) {
-      args.push(`-headers`, `'Referer: ${referrer}'`)
-    }
+  const userAgent = itemUserAgent.length ? itemUserAgent : config.userAgent
+  if (referrer.length) {
+    args.push(`-headers`, `'Referer: ${referrer}'`)
   }
 
   if (userAgent) {
@@ -154,9 +117,9 @@ function checkItem(item) {
 
   args = args.join(` `)
 
-  debugLogger(`EXECUTING: "${args}"`)
+  logger.debug(`EXECUTING: "${args}"`)
 
-  return execAsync(args, { timeout })
+  return execAsync(args, { timeout: config.timeout })
     .then(({ stdout }) => {
       if (!isJSON(stdout)) {
         return { ok: false, reason: parseMessage(stdout, item) }
@@ -171,44 +134,22 @@ function checkItem(item) {
 
 async function validateStatus(item) {
   item.status = await checkItem.call(this, item)
+  const { config, logger } = this
 
   if (item.status.ok) {
-    this.stats.online++
-    this.debugLogger(`OK: ${item.url}`.green)
+    logger.debug(`OK: ${item.url}`.green)
   } else {
-    this.stats.offline++
-    this.debugLogger(
-      `FAILED: ${item.url}`.red + ` (${item.status.reason})`.yellow
-    )
+    logger.debug(`FAILED: ${item.url} (${item.status.reason})`.red)
   }
 
-  await this.config.itemCallback.call(null, item)
+  await config.afterEach.call(null, item)
 
   return item
-}
-
-function statsLogger({ config, stats, debugLogger }) {
-  if (!config.debug) return
-
-  let colors = {
-    total: `white`,
-    online: `green`,
-    offline: `red`,
-    duplicates: `yellow`,
-  }
-
-  for (let [key, val] of Object.entries(stats)) {
-    debugLogger(`${key.toUpperCase()}: ${val}`[colors[key]])
-  }
 }
 
 module.exports = {
   addToCache,
   checkCache,
-  chunk,
-  debugLogger,
-  orderBy,
   parsePlaylist,
-  statsLogger,
   validateStatus,
 }
