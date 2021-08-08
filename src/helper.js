@@ -3,9 +3,11 @@ const util = require('util')
 const { parse } = require('iptv-playlist-parser')
 const { isWebUri } = require('valid-url')
 const { existsSync, readFile } = require('fs')
-
-const execAsync = util.promisify(require('child_process').exec)
+const exec = require('child_process').exec
+const execAsync = util.promisify(exec)
 const readFileAsync = util.promisify(readFile)
+
+let cache = new Set()
 
 const axios = Axios.create({
   method: 'GET',
@@ -28,24 +30,6 @@ axios.interceptors.response.use(
   }
 )
 
-let cache = new Set()
-
-function hashUrl(u) {
-  return Buffer.from(u).toString(`hex`)
-}
-
-function addToCache({ url }) {
-  let id = hashUrl(url)
-
-  cache.add(id)
-}
-
-function checkCache({ url }) {
-  let id = hashUrl(url)
-
-  return cache.has(id)
-}
-
 async function parsePlaylist(input) {
   if (input instanceof Object && Reflect.has(input, `items`)) return input
 
@@ -64,47 +48,65 @@ async function parsePlaylist(input) {
   return parse(data)
 }
 
-function parseMessage(reason, { url }) {
-  if (!reason) return
+function parseStdout(string, item) {
+  const url = item.url
+  const arr = string.split('\n')
 
-  const msgArr = reason.split('\n')
+  if (arr.length === 0) return
 
-  if (msgArr.length === 0) return
-
-  const line = msgArr.find(line => {
-    return line.indexOf(url) === 0
+  const line = arr.find(l => {
+    return l.indexOf(url) === 0
   })
 
   if (!line) {
-    if (/^Command failed/.test(reason)) return `Timed out`
-    return reason
+    if (/^Command failed/.test(string)) {
+      return 'Operation timed out'
+    }
   }
 
   return line.replace(`${url}: `, '')
 }
 
-function isJSON(str) {
-  try {
-    return !!JSON.parse(str)
-  } catch (e) {
-    return false
-  }
+function checkItem(item) {
+  const { config, logger } = this
+
+  const command = buildCommand(item, config)
+
+  logger.debug(`EXECUTING: "${command}"`)
+
+  return execAsync(command, { timeout: config.timeout })
+    .then(({ stdout }) => {
+      if (stdout && isJSON(stdout)) {
+        const metadata = JSON.parse(stdout)
+        if (!metadata.streams.length) {
+          return { ok: false, reason: 'No working streams' }
+        }
+
+        return { ok: true, metadata }
+      }
+
+      return { ok: false, reason: 'Parsing error' }
+    })
+    .catch(err => {
+      const reason = parseStdout(err.message, item)
+
+      return { ok: false, reason }
+    })
 }
 
-function checkItem(item) {
+function buildCommand(item, config) {
   const { url, http = {} } = item
-  let { referrer = ``, 'user-agent': itemUserAgent = `` } = http
-  const { config, logger } = this
+  const { referrer = ``, 'user-agent': itemUserAgent = `` } = http
+  const userAgent = itemUserAgent.length ? itemUserAgent : config.userAgent
 
   let args = [
     `ffprobe`,
     `-of json`,
-    `-v error`,
+    `-v trace`,
     `-hide_banner`,
     `-show_streams`,
   ]
 
-  const userAgent = itemUserAgent.length ? itemUserAgent : config.userAgent
   if (referrer.length) {
     args.push(`-headers`, `'Referer: ${referrer}'`)
   }
@@ -117,39 +119,36 @@ function checkItem(item) {
 
   args = args.join(` `)
 
-  logger.debug(`EXECUTING: "${args}"`)
-
-  return execAsync(args, { timeout: config.timeout })
-    .then(({ stdout }) => {
-      if (!isJSON(stdout)) {
-        return { ok: false, reason: parseMessage(stdout, item) }
-      }
-      const metadata = JSON.parse(stdout)
-      if (!metadata.streams.length)
-        return { ok: false, reason: 'No working streams' }
-      return { ok: true, metadata }
-    })
-    .catch(err => ({ ok: false, reason: parseMessage(err.message, item) }))
+  return args
 }
 
-async function validateStatus(item) {
-  item.status = await checkItem.call(this, item)
-  const { config, logger } = this
+function hashUrl(u) {
+  return Buffer.from(u).toString(`hex`)
+}
 
-  if (item.status.ok) {
-    logger.debug(`OK: ${item.url}`.green)
-  } else {
-    logger.debug(`FAILED: ${item.url} (${item.status.reason})`.red)
+function addToCache({ url }) {
+  let id = hashUrl(url)
+
+  cache.add(id)
+}
+
+function checkCache({ url }) {
+  let id = hashUrl(url)
+
+  return cache.has(id)
+}
+
+function isJSON(str) {
+  try {
+    return !!JSON.parse(str)
+  } catch (e) {
+    return false
   }
-
-  await config.afterEach.call(null, item)
-
-  return item
 }
 
 module.exports = {
   addToCache,
   checkCache,
   parsePlaylist,
-  validateStatus,
+  checkItem,
 }
