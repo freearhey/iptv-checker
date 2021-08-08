@@ -1,4 +1,4 @@
-# IPTV Checker
+# IPTV Checker [![Build Status](https://travis-ci.com/freearhey/iptv-checker.svg?branch=master)](https://travis-ci.com/freearhey/iptv-checker)
 
 Node.js CLI tool for checking links in IPTV playlists.
 
