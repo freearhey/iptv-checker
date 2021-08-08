@@ -69,8 +69,6 @@ class IPTVChecker {
       results.push(item)
     }
 
-    const ctx = { config, logger }
-
     if (+config.parallel === 1) {
       for (let item of items) {
         const checkedItem = await this.checkStream(item)
