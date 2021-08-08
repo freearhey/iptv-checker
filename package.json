@@ -38,6 +38,7 @@
     "get-stdin": "^7.0.0",
     "iptv-playlist-parser": "^0.5.4",
     "jest": "^27.0.6",
+    "lodash.chunk": "^4.2.0",
     "progress": "^2.0.3",
     "valid-url": "^1.0.9"
   },
