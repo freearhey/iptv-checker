@@ -6,7 +6,7 @@ const getStdin = require('get-stdin')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
 const { version, homepage } = require('../package.json')
-const playlistChecker = require('../src/index')
+const IPTVChecker = require('../src/index')
 const Logger = require('../src/Logger')
 
 let seedFile
@@ -56,7 +56,7 @@ const config = {
   userAgent: argv.userAgent,
   timeout: parseInt(argv.timeout),
   parallel: +argv.parallel,
-  beforeAll,
+  setUp,
   afterEach,
 }
 
@@ -86,7 +86,8 @@ async function init() {
   try {
     if (!seedFile || !seedFile.length) seedFile = await getStdin()
 
-    const checked = await playlistChecker(seedFile, config)
+    const checker = new IPTVChecker(config)
+    const checked = await checker.checkPlaylist(seedFile)
 
     stats.online = checked.items.filter(item => item.status.ok).length
     stats.offline = checked.items.filter(
@@ -125,7 +126,7 @@ function afterEach(item) {
   }
 }
 
-function beforeAll(playlist) {
+function setUp(playlist) {
   stats.total = playlist.items.length
   bar = new ProgressBar('[:bar] :current/:total (:percent) ', {
     total: stats.total,
