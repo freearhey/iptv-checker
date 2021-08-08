@@ -1,26 +1,19 @@
 require('colors')
-const helper = require('./helper')
+const chunk = require('lodash.chunk')
 const { isUri } = require('valid-url')
 const commandExists = require('command-exists')
+const helper = require('./helper')
+const Logger = require('./Logger')
 
 const procs = require('os').cpus().length - 1
-
-let stats = {
-  total: 0,
-  online: 0,
-  offline: 0,
-  duplicates: 0,
-}
 
 const defaultConfig = {
   debug: false,
   userAgent: null,
   timeout: 60000,
   parallel: procs || 1,
-  omitMetadata: false,
-  useItemHttpHeaders: true,
-  preCheckAction: parsedPlaylist => {}, // eslint-disable-line
-  itemCallback: item => {}, // eslint-disable-line
+  beforeAll: playlist => {}, // eslint-disable-line
+  afterEach: item => {}, // eslint-disable-line
 }
 
 module.exports = async function (input, opts = {}) {
@@ -42,9 +35,11 @@ module.exports = async function (input, opts = {}) {
   const duplicates = []
   const config = { ...defaultConfig, ...opts }
   const playlist = await helper.parsePlaylist(input)
-  const debugLogger = helper.debugLogger(config)
+  const logger = new Logger(config)
 
-  debugLogger(config)
+  logger.debug({ config })
+
+  await config.beforeAll(playlist)
 
   const items = playlist.items
     .map(item => {
@@ -62,27 +57,13 @@ module.exports = async function (input, opts = {}) {
     })
     .filter(Boolean)
 
-  await config.preCheckAction.call(null, {
-    ...playlist,
-    items: [...items, ...duplicates],
-  })
-
-  stats.total = items.length + duplicates.length
-
-  stats.duplicates = duplicates.length
-
-  debugLogger(`Checking ${stats.total} playlist items...`)
-
-  if (duplicates.length)
-    debugLogger(`Found ${stats.duplicates} duplicates...`.yellow)
-
   for (let item of duplicates) {
     item.status = { ok: false, reason: `Duplicate` }
-    await config.itemCallback(item)
+    await config.afterEach(item)
     results.push(item)
   }
 
-  const ctx = { config, stats, debugLogger }
+  const ctx = { config, logger }
 
   const validator = helper.validateStatus.bind(ctx)
 
@@ -93,23 +74,13 @@ module.exports = async function (input, opts = {}) {
       results.push(checkedItem)
     }
   } else {
-    const chunkedItems = helper.chunk(items, +config.parallel)
+    const chunkedItems = chunk(items, +config.parallel)
 
     for (let [...chunk] of chunkedItems) {
       const chunkResults = await Promise.all(chunk.map(validator))
       results.push(...chunkResults)
     }
   }
-
-  playlist.items = helper.orderBy(results, [`name`])
-
-  if (config.omitMetadata) {
-    for (let item of playlist.items) {
-      delete item.status.metadata
-    }
-  }
-
-  helper.statsLogger(ctx)
 
   return playlist
 }
