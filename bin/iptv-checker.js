@@ -1,15 +1,22 @@
 #! /usr/bin/env node
 
-require('colors')
-const playlistChecker = require('../src/index.js')
 const fs = require('fs')
-const getStdin = require('get-stdin')
 const argv = require('commander')
+const getStdin = require('get-stdin')
 const ProgressBar = require('progress')
 const dateFormat = require('dateformat')
 const { version, homepage } = require('../package.json')
+const playlistChecker = require('../src/index')
+const Logger = require('../src/Logger')
 
 let seedFile
+let bar
+const stats = {
+  total: 0,
+  online: 0,
+  offline: 0,
+  duplicates: 0,
+}
 
 argv
   .version(version, '-v, --version')
@@ -29,7 +36,11 @@ argv
     'Batch size of items to check concurrently',
     1
   )
-  .option('-a, --user-agent <user-agent>', 'Set custom HTTP User-Agent')
+  .option(
+    '-a, --user-agent <user-agent>',
+    'Set custom HTTP User-Agent',
+    `IPTVChecker/${version} (${homepage})`
+  )
   .option('-k, --insecure', 'Allow insecure connections when using SSL')
   .option('-d, --debug', 'Toggle debug mode')
   .action(function (file = null) {
@@ -39,23 +50,25 @@ argv
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = !+argv.insecure
 
+const config = {
+  debug: argv.debug,
+  insecure: argv.insecure,
+  userAgent: argv.userAgent,
+  timeout: parseInt(argv.timeout),
+  parallel: +argv.parallel,
+  beforeAll,
+  afterEach,
+}
+
+const logger = new Logger(config)
+
+logger.debug({ config })
+
 const outputDir =
   argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
 const onlineFile = `${outputDir}/online.m3u`
 const offlineFile = `${outputDir}/offline.m3u`
 const duplicatesFile = `${outputDir}/duplicates.m3u`
-
-const defaultUserAgent = `IPTVChecker/${version} (${homepage})`
-
-const config = {
-  debug: argv.debug,
-  insecure: argv.insecure,
-  userAgent: argv.userAgent || defaultUserAgent,
-  timeout: parseInt(argv.timeout),
-  parallel: +argv.parallel,
-  itemCallback: validate,
-  preCheckAction: preCheck,
-}
 
 try {
   fs.lstatSync(outputDir)
@@ -67,29 +80,19 @@ fs.writeFileSync(onlineFile, '#EXTM3U\n')
 fs.writeFileSync(offlineFile, '#EXTM3U\n')
 fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
 
-let bar
-let stats = {
-  total: 0,
-  online: 0,
-  offline: 0,
-  duplicates: 0,
-}
-
 init()
 
 async function init() {
   try {
     if (!seedFile || !seedFile.length) seedFile = await getStdin()
 
-    const checkedList = await playlistChecker(seedFile, config)
+    const checked = await playlistChecker(seedFile, config)
 
-    stats.online = checkedList.items.filter(item => item.status.ok).length
-
-    stats.offline = checkedList.items.filter(
+    stats.online = checked.items.filter(item => item.status.ok).length
+    stats.offline = checked.items.filter(
       item => !item.status.ok && item.status.reason !== `Duplicate`
     ).length
-
-    stats.duplicates = checkedList.items.filter(
+    stats.duplicates = checked.items.filter(
       item => !item.status.ok && item.status.reason === `Duplicate`
     ).length
 
@@ -100,16 +103,15 @@ async function init() {
       `Duplicates: ${stats.duplicates}`.yellow,
     ].join('\n')
 
-    console.log(`\n${result}`)
-
+    logger.info(`\n${result}`)
     process.exit(0)
   } catch (err) {
-    console.error(err)
+    logger.error(err)
     process.exit(1)
   }
 }
 
-function validate(item) {
+function afterEach(item) {
   if (item.status.ok) {
     writeToFile(onlineFile, item)
   } else if (item.status.reason === `Duplicate`) {
@@ -123,7 +125,7 @@ function validate(item) {
   }
 }
 
-function preCheck(playlist) {
+function beforeAll(playlist) {
   stats.total = playlist.items.length
   bar = new ProgressBar('[:bar] :current/:total (:percent) ', {
     total: stats.total,
