@@ -48,21 +48,14 @@ async function parsePlaylist(input) {
   return parse(data)
 }
 
-function parseStdout(string, item) {
+function parseStdout(output, item) {
   const url = item.url
-  const arr = string.split('\n')
-
-  if (arr.length === 0) return
-
-  const line = arr.find(l => {
+  const line = output.split('\n').find(l => {
     return l.indexOf(url) === 0
   })
 
   if (!line) {
-    if (/^Command failed/.test(string)) {
-      return 'Operation timed out'
-    }
-    return 'Operation failed (internal error)'
+    return 'Operation timed out'
   }
 
   return line.replace(`${url}: `, '')
