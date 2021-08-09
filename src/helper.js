@@ -62,6 +62,7 @@ function parseStdout(string, item) {
     if (/^Command failed/.test(string)) {
       return 'Operation timed out'
     }
+    return 'Operation failed'
   }
 
   return line.replace(`${url}: `, '')
