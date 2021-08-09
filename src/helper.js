@@ -73,7 +73,7 @@ function checkItem(item) {
       if (stdout && isJSON(stdout)) {
         const metadata = JSON.parse(stdout)
         if (!metadata.streams.length) {
-          return { ok: false, reason: 'No working streams' }
+          return { ok: false, reason: 'No streams found' }
         }
 
         return { ok: true, metadata }
