@@ -103,7 +103,7 @@ function buildCommand(item, config) {
   let args = [
     `ffprobe`,
     `-of json`,
-    `-v trace`,
+    `-v error`,
     `-hide_banner`,
     `-show_streams`,
   ]
