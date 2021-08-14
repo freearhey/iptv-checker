@@ -12,7 +12,8 @@ function resultTester(result) {
       Reflect.has(item, `status`) &&
       Reflect.has(item.status, `ok`) &&
       (Reflect.has(item.status, `reason`) ||
-        Reflect.has(item.status, `metadata`))
+        (Reflect.has(item.status, `metadata`) &&
+          Reflect.has(item.status.metadata, `requests`)))
     )
   })
 }
