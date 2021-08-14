@@ -71,7 +71,7 @@ function parseStderr(stderr) {
 }
 
 function parseRequest(string) {
-  const urlMatch = string.match(/\Opening \'(.*)\' for reading/)
+  const urlMatch = string.match(/Opening '(.*)' for reading/)
   const url = urlMatch ? urlMatch[1] : null
   if (!url) return null
   const requestMatch = string.match(/request: (.|[\r\n])+/gm)
