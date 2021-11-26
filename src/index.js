@@ -90,19 +90,16 @@ class IPTVChecker {
   }
 
   async checkStream(item) {
-    const config = this.config
-    const logger = this.logger
+    await this.config.beforeEach(item)
 
-    await config.beforeEach(item)
-
-    item.status = await helper.checkItem.call({ config, logger }, item)
+    item.status = await helper.checkItem.call(this, item)
     if (item.status.ok) {
-      logger.debug(`OK: ${item.url}`.green)
+      this.logger.debug(`OK: ${item.url}`.green)
     } else {
-      logger.debug(`FAILED: ${item.url} (${item.status.reason})`.red)
+      this.logger.debug(`FAILED: ${item.url} (${item.status.reason})`.red)
     }
 
-    await config.afterEach(item)
+    await this.config.afterEach(item)
 
     return item
   }
