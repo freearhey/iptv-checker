@@ -126,10 +126,7 @@ function checkItem(item) {
 }
 
 function buildCommand(item, config) {
-  const { url, http = {} } = item
-  const { referrer = ``, 'user-agent': itemUserAgent = `` } = http
-  const userAgent = itemUserAgent.length ? itemUserAgent : config.userAgent
-
+  const userAgent = item.http['user-agent'] || config.userAgent
   let args = [
     `ffprobe`,
     `-of json`,
@@ -139,15 +136,19 @@ function buildCommand(item, config) {
     `-show_format`,
   ]
 
-  if (referrer.length) {
-    args.push(`-headers`, `'Referer: ${referrer}'`)
+  if (config.timeout) {
+    args.push(`-timeout`, `'${config.timeout * 1000}'`)
+  }
+
+  if (item.http.referrer) {
+    args.push(`-headers`, `'Referer: ${item.http.referrer}'`)
   }
 
   if (userAgent) {
     args.push(`-user_agent`, `'${userAgent}'`)
   }
 
-  args.push(`'${url}'`)
+  args.push(`'${item.url}'`)
 
   args = args.join(` `)
 
