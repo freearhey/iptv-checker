@@ -1,3 +1,4 @@
+const { performance } = require('perf_hooks')
 const { execSync } = require('child_process')
 const mkdirp = require('mkdirp')
 const del = require('del')
@@ -40,4 +41,15 @@ test(`Should process a playlist URL`, () => {
   )
 
   expect(stdoutResultTester(result)).toBeTruthy()
+})
+
+test(`Should respect timeout argument`, () => {
+  let t0 = performance.now()
+  const result = execSync(
+    `node ${pwd}/bin/iptv-checker.js -t 7000 -o ${pwd}/test/output ${pwd}/test/input/timeout.m3u`,
+    { encoding: 'utf8' }
+  )
+  let t1 = performance.now()
+
+  expect(t1 - t0).toBeGreaterThan(7000)
 })
