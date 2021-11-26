@@ -62,8 +62,6 @@ const config = {
 
 const logger = new Logger(config)
 
-logger.debug({ config })
-
 const outputDir =
   argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
 const onlineFile = `${outputDir}/online.m3u`
