@@ -45,7 +45,7 @@ test(`Should process a playlist URL`, () => {
 
 test(`Should respect timeout argument`, () => {
   let t0 = performance.now()
-  const result = execSync(
+  execSync(
     `node ${pwd}/bin/iptv-checker.js -t 7000 -o ${pwd}/test/output ${pwd}/test/input/timeout.m3u`,
     { encoding: 'utf8' }
   )
