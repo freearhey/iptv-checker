@@ -65,7 +65,7 @@ checker.checkPlaylist(string).then(results => {
 
 #### Results
 
-On success:
+*On success:*
 
 ```js
 {
@@ -184,7 +184,7 @@ On success:
 }
 ```
 
-On error:
+*On error:*
 
 ```js
 {
