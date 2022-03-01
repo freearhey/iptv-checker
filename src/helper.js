@@ -137,18 +137,18 @@ function buildCommand(item, config) {
   ]
 
   if (config.timeout) {
-    args.push(`-timeout`, `'${config.timeout * 1000}'`)
+    args.push(`-timeout`, `"${config.timeout * 1000}"`)
   }
 
   if (item.http.referrer) {
-    args.push(`-headers`, `'Referer: ${item.http.referrer}'`)
+    args.push(`-headers`, `"Referer: ${item.http.referrer}"`)
   }
 
   if (userAgent) {
-    args.push(`-user_agent`, `'${userAgent}'`)
+    args.push(`-user_agent`, `"${userAgent}"`)
   }
 
-  args.push(`'${item.url}'`)
+  args.push(`"${item.url}"`)
 
   args = args.join(` `)
 
