@@ -103,7 +103,8 @@ function checkItem(item) {
 
   logger.debug(`EXECUTING: "${command}"`)
 
-  return execAsync(command, { timeout: config.timeout })
+  const timeout = item.timeout || config.timeout
+  return execAsync(command, { timeout })
     .then(({ stdout, stderr }) => {
       if (stdout && isJSON(stdout) && stderr) {
         const metadata = JSON.parse(stdout)
@@ -126,7 +127,13 @@ function checkItem(item) {
 }
 
 function buildCommand(item, config) {
-  const userAgent = item.http['user-agent'] || config.userAgent
+  const userAgent =
+    item.http && item.http['user-agent']
+      ? item.http['user-agent']
+      : config.userAgent
+  const referer =
+    item.http && item.http.referrer ? item.http.referrer : config.httpReferer
+  const timeout = item.timeout || config.timeout
   let args = [
     `ffprobe`,
     `-of json`,
@@ -136,12 +143,12 @@ function buildCommand(item, config) {
     `-show_format`,
   ]
 
-  if (config.timeout) {
-    args.push(`-timeout`, `"${config.timeout * 1000}"`)
+  if (timeout) {
+    args.push(`-timeout`, `"${timeout * 1000}"`)
   }
 
-  if (item.http.referrer) {
-    args.push(`-headers`, `"Referer: ${item.http.referrer}"`)
+  if (referer) {
+    args.push(`-headers`, `"Referer: ${referer}"`)
   }
 
   if (userAgent) {
