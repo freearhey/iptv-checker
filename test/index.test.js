@@ -27,6 +27,14 @@ test(`Should process a playlist URL`, async () => {
   expect(resultTester(results)).toBeTruthy()
 })
 
+test(`Should process a stream URL`, async () => {
+  const url =
+    'http://cdn.theoplayer.com/video/elephants-dream/playlist-single-audio.m3u8'
+  const results = await checker.checkStream({ url, timeout: 5000 })
+
+  expect(results.status.ok).toBeTruthy()
+})
+
 test(`Should process a relative playlist file path`, async () => {
   const path = 'test/input/dummy.m3u'
   const results = await checker.checkPlaylist(path)
