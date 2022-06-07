@@ -44,12 +44,11 @@ module.exports = {
 	HTTP_INSUFFICIENT_STORAGE: 'HTTP 507 Insufficient Storage',
 	HTTP_NETWORK_AUTHENTICATION_REQUIRED:
 		'HTTP 511 Network Authentication Required',
-
-	SYSTEM_PROTOCOL_ERROR: 'SYSTEM Protocol Error',
-	SYSTEM_PARSE_ERROR: 'SYSTEM Parse Error',
-	SYSTEM_NETWORK_UNREACHABLE: 'SYSTEM Network Unreachable',
-	SYSTEM_ECONNRESET: 'SYSTEM Connection Reset',
-	SYSTEM_UNDEFINED: 'SYSTEM Undefined Error',
+	HTT_PROTOCOL_ERROR: 'HTTP Protocol Error',
+	HTT_PARSE_ERROR: 'HTTP Parse Error',
+	HTT_NETWORK_UNREACHABLE: 'HTTP Network Unreachable',
+	HTT_ECONNRESET: 'HTTP Connection Reset',
+	HTTP_UNDEFINED: 'HTTP Undefined Error',
 
 	FFMPEG_INPUT_OUTPUT_ERROR: 'FFMPEG Input/output Error',
 	FFMPEG_PROTOCOL_NOT_FOUND: 'FFMPEG Protocol Not Found',

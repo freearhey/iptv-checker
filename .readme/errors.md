@@ -39,11 +39,11 @@
 | HTTP_HTTP_VERSION_NOT_SUPPORTED      | HTTP 505 HTTP Version Not Supported      |
 | HTTP_INSUFFICIENT_STORAGE            | HTTP 507 Insufficient Storage            |
 | HTTP_NETWORK_AUTHENTICATION_REQUIRED | HTTP 511 Network Authentication Required |
-| SYSTEM_PROTOCOL_ERROR                | SYSTEM Protocol Error                    |
-| SYSTEM_PARSE_ERROR                   | SYSTEM Parse Error                       |
-| SYSTEM_NETWORK_UNREACHABLE           | SYSTEM Network Unreachable               |
-| SYSTEM_ECONNRESET                    | SYSTEM Connection Reset                  |
-| SYSTEM_UNDEFINED                     | SYSTEM Undefined Error                   |
+| HTTP_PROTOCOL_ERROR                  | HTTP Protocol Error                      |
+| HTTP_PARSE_ERROR                     | HTTP Parse Error                         |
+| HTTP_NETWORK_UNREACHABLE             | HTTP Network Unreachable                 |
+| HTTP_ECONNRESET                      | HTTP Connection Reset                    |
+| HTTP_UNDEFINED                       | HTTP Undefined Error                     |
 | FFMPEG_INPUT_OUTPUT_ERROR            | FFMPEG Input/output Error                |
 | FFMPEG_PROTOCOL_NOT_FOUND            | FFMPEG Protocol Not Found                |
 | FFMPEG_INVALID_DATA                  | FFMPEG Invalid Data                      |

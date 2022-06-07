@@ -103,6 +103,7 @@ class IPTVChecker {
     item.status = await loadStream(item, config, logger)
       .then(status => {
         if (status) return status
+
         return ffprobe(item, config, logger)
       })
       .catch(err => {

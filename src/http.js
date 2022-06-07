@@ -92,21 +92,21 @@ function parseError(err, config, logger) {
 	} else if (err.message.includes('ECONNREFUSED')) {
 		return 'HTTP_INTERNAL_SERVER_ERROR'
 	} else if (err.code === 'EPROTO') {
-		return 'SYSTEM_PROTOCOL_ERROR'
+		return 'HTTP_PROTOCOL_ERROR'
 	} else if (err.code === 'ENETUNREACH') {
-		return 'SYSTEM_NETWORK_UNREACHABLE'
+		return 'HTTP_NETWORK_UNREACHABLE'
 	} else if (err.code === 'ENOTFOUND') {
-		return 'SYSTEM_NOT_FOUND'
+		return 'HTTP_NOT_FOUND'
 	} else if (err.code === 'ECONNRESET') {
-		return 'SYSTEM_ECONNRESET'
+		return 'HTTP_ECONNRESET'
 	} else if (err.code.startsWith('HPE')) {
-		return 'SYSTEM_PARSE_ERROR'
+		return 'HTTP_PARSE_ERROR'
 	}
 
-	logger.debug('SYSTEM_UNDEFINED')
+	logger.debug('HTTP_UNDEFINED')
 	logger.debug(err)
 
-	return 'SYSTEM_UNDEFINED'
+	return 'HTTP_UNDEFINED'
 }
 
 function parseResponseStatus(status) {
