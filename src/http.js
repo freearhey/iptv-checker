@@ -14,6 +14,7 @@ const playlistClient = axios.create({
 		rejectUnauthorized: false,
 	}),
 })
+
 playlistClient.interceptors.response.use(
 	response => {
 		const { 'content-type': contentType = '' } = response.headers
@@ -24,7 +25,7 @@ playlistClient.interceptors.response.use(
 		return response.data
 	},
 	() => {
-		return Promise.reject(`Error fetching playlist`)
+		return Promise.reject('Error fetching playlist')
 	}
 )
 
