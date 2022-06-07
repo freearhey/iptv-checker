@@ -47,5 +47,6 @@ module.exports = {
 	HTTP_NETWORK_AUTHENTICATION_REQUIRED: 'Network Authentication Required',
 
 	// ffmpeg
+	STREAM_NOT_FOUND: 'Stream not found',
 	UNKNOWN: 'Unknown error occurred',
 }

@@ -7,8 +7,42 @@ const exec = require('child_process').exec
 const execAsync = util.promisify(exec)
 const readFileAsync = util.promisify(readFile)
 const errors = require('./errors')
+const curlirize = require('axios-curlirize')
+const https = require('https')
 
 let cache = new Set()
+
+const playlistClient = axios.create({
+  method: 'GET',
+  timeout: 60000, // 60 second timeout
+  responseType: 'text',
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false,
+  }),
+})
+playlistClient.interceptors.response.use(
+  response => {
+    const { 'content-type': contentType = '' } = response.headers
+    if (!/mpegurl/.test(contentType)) {
+      return Promise.reject('URL is not an .m3u playlist file')
+    }
+    return response.data
+  },
+  () => {
+    return Promise.reject(`Error fetching playlist`)
+  }
+)
+
+const streamClient = axios.create({
+  timeout: 60000,
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false,
+  }),
+})
+curlirize(streamClient, (result, err) => {
+  const { command } = result
+  console.log(`CURL: "${command}"`)
+})
 
 module.exports = {
   addToCache,
@@ -17,34 +51,15 @@ module.exports = {
   checkItem,
 }
 
-async function parsePlaylist(input) {
+async function parsePlaylist(input, logger) {
   if (input instanceof Object && Reflect.has(input, `items`)) return input
 
   let data = input
-  const httpClient = axios.create({
-    method: 'GET',
-    timeout: 60000, // 60 second timeout
-    responseType: 'text',
-  })
-
-  httpClient.interceptors.response.use(
-    response => {
-      const { 'content-type': contentType = '' } = response.headers
-      if (!/mpegurl/.test(contentType)) {
-        return Promise.reject('URL is not an .m3u playlist file')
-      }
-      return response.data
-    },
-    () => {
-      return Promise.reject(`Error fetching playlist`)
-    }
-  )
-
   if (Buffer.isBuffer(input)) {
     data = input.toString(`utf8`)
   } else if (typeof input === `string`) {
     if (isWebUri(input)) {
-      data = await httpClient(input)
+      data = await playlistClient(input)
     } else if (existsSync(input)) {
       data = await readFileAsync(input, { encoding: `utf8` })
     }
@@ -102,9 +117,10 @@ function preflightRequest(item, config) {
     headers['Referer'] = referer
   }
 
-  return axios.head(item.url, {
+  return streamClient.head(item.url, {
     timeout,
     headers,
+    curlirize: config.debug,
   })
 }
 
@@ -314,7 +330,7 @@ function parseAxiosError(err) {
     return 'HTTP_INTERNAL_SERVER_ERROR'
   }
 
-  console.log('parseAxiosError', err)
+  console.log('UNKNOWN', err)
 
   return 'UNKNOWN'
 }

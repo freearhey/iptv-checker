@@ -44,7 +44,7 @@ class IPTVChecker {
 
     logger.debug({ config })
 
-    const playlist = await helper.parsePlaylist(input).catch(err => {
+    const playlist = await helper.parsePlaylist(input, logger).catch(err => {
       throw err
     })
 
@@ -99,7 +99,7 @@ class IPTVChecker {
     if (item.status.ok) {
       this.logger.debug(`OK: ${item.url}`.green)
     } else {
-      this.logger.debug(`FAILED: ${item.url} (${item.status.reason})`.red)
+      this.logger.debug(`FAILED: ${item.url} (${item.status.message})`.red)
     }
 
     await this.config.afterEach(item)
