@@ -1,6 +1,5 @@
 // HTTP: https://github.com/prettymuchbryce/http-status-codes/blob/master/README.md#codes
 // FFmpeg: https://github.com/FFmpeg/FFmpeg/blob/636631d9db82f5e86330ab42dacc8a106684b349/libavutil/error.c
-// axios: https://github.com/axios/axios/blob/v1.x/lib/core/AxiosError.js
 // Linux: https://www.man7.org/linux/man-pages/man3/errno.3.html
 
 module.exports = {
@@ -23,7 +22,7 @@ module.exports = {
 	HTTP_REQUESTED_RANGE_NOT_SATISFIABLE:
 		'HTTP 416 Requested Range Not Satisfiable',
 	HTTP_EXPECTATION_FAILED: 'HTTP 417 Expectation Failed',
-	HTTP_IM_A_TEAPOT: "418 I'm a teapot",
+	HTTP_IM_A_TEAPOT: "HTTP 418 I'm a teapot",
 	HTTP_INSUFFICIENT_SPACE_ON_RESOURCE:
 		'HTTP 419 Insufficient Space on Resource',
 	HTTP_METHOD_FAILURE: 'HTTP 420 Method Failure',
@@ -45,17 +44,17 @@ module.exports = {
 	HTTP_INSUFFICIENT_STORAGE: 'HTTP 507 Insufficient Storage',
 	HTTP_NETWORK_AUTHENTICATION_REQUIRED:
 		'HTTP 511 Network Authentication Required',
-	HTTP_PROTOCOL_ERROR: 'HTTP Protocol Error',
-	HTTP_PARSE_ERROR: 'HTTP Parse Error',
-	HTTP_NETWORK_UNREACHABLE: 'HTTP Network Unreachable',
-	HTTP_ECONNRESET: 'HTTP Connection Reset',
-	HTTP_UNDEFINED: 'HTTP Undefined Error',
+
+	SYSTEM_PROTOCOL_ERROR: 'SYSTEM Protocol Error',
+	SYSTEM_PARSE_ERROR: 'SYSTEM Parse Error',
+	SYSTEM_NETWORK_UNREACHABLE: 'SYSTEM Network Unreachable',
+	SYSTEM_ECONNRESET: 'SYSTEM Connection Reset',
+	SYSTEM_UNDEFINED: 'SYSTEM Undefined Error',
 
 	FFMPEG_INPUT_OUTPUT_ERROR: 'FFMPEG Input/output Error',
 	FFMPEG_PROTOCOL_NOT_FOUND: 'FFMPEG Protocol Not Found',
 	FFMPEG_INVALID_DATA: 'FFMPEG Invalid Data',
 	FFMPEG_PROCESS_TIMEOUT: 'FFMPEG Process Timeout',
 	FFMPEG_UNDEFINED: 'FFMPEG Undefined Error',
-
-	STREAMS_NOT_FOUND: 'Streams Not Found',
+	FFMPEG_STREAMS_NOT_FOUND: 'Streams Not Found',
 }

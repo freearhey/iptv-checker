@@ -40,54 +40,6 @@ test(`Should process a stream URL`, done => {
     .catch(done)
 })
 
-test(`Should handle error HTTP_UNAVAILABLE_FOR_LEGAL_REASONS`, done => {
-  const url = 'https://mock.codes/451'
-  checker
-    .checkStream({ url, timeout: 2000 })
-    .then(results => {
-      expect(results.status.code).toBe('HTTP_UNAVAILABLE_FOR_LEGAL_REASONS')
-      expect(results.status.message).toBe('Unavailable For Legal Reasons')
-      done()
-    })
-    .catch(done)
-})
-
-test.only(`Should handle request with forbidden HEAD method`, done => {
-  const url = 'https://live.ecomservice.bg/hls/stream.m3u8'
-  checker
-    .checkStream({ url, timeout: 2000 })
-    .then(results => {
-      expect(results.status.ok).toBe(true)
-      done()
-    })
-    .catch(done)
-})
-
-test(`Should handle error HTTP_REQUEST_TIMEOUT`, done => {
-  const url = 'http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8'
-  checker
-    .checkStream({ url, timeout: 2000 })
-    .then(results => {
-      expect(results.status.code).toBe('HTTP_REQUEST_TIMEOUT')
-      expect(results.status.message).toBe('Request Timeout')
-      done()
-    })
-    .catch(done)
-})
-
-test(`Should handle error HTTP_FORBIDDEN`, done => {
-  const url =
-    'https://artesimulcast.akamaized.net/hls/live/2030993/artelive_de/index.m3u8'
-  checker
-    .checkStream({ url, timeout: 2000 })
-    .then(results => {
-      expect(results.status.code).toBe('HTTP_FORBIDDEN')
-      expect(results.status.message).toBe('Forbidden')
-      done()
-    })
-    .catch(done)
-})
-
 test(`Should process a relative playlist file path`, done => {
   const path = 'test/input/dummy.m3u'
   checker
@@ -146,7 +98,7 @@ test(`Should throw with invalid input`, async () => {
 test(`Should throw with invalid file path`, async () => {
   const badPath = `${__dirname}/input/badPath.m3u`
   await expect(checker.checkPlaylist(badPath)).rejects.toThrow(
-    'Playlist is not valid'
+    'Unable to parse a playlist'
   )
 })
 
@@ -158,6 +110,42 @@ test(`Should throw on URL fetch failure`, async () => {
 
 test(`Should throw on invalid fetched input data`, async () => {
   await expect(checker.checkPlaylist(`https://github.com`)).rejects.toThrow(
-    'URL is not an .m3u playlist file'
+    'URL is not an M3U playlist file'
   )
+})
+
+test(`Should handle request with forbidden HEAD method`, done => {
+  const url = 'https://live.ecomservice.bg/hls/stream.m3u8'
+  checker
+    .checkStream({ url, timeout: 2000 })
+    .then(results => {
+      expect(results.status.ok).toBe(true)
+      done()
+    })
+    .catch(done)
+})
+
+test(`Should handle HTTP_REQUEST_TIMEOUT`, done => {
+  const url = 'http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8'
+  checker
+    .checkStream({ url, timeout: 2000 })
+    .then(results => {
+      expect(results.status.code).toBe('HTTP_REQUEST_TIMEOUT')
+      expect(results.status.message).toBe('HTTP 408 Request Timeout')
+      done()
+    })
+    .catch(done)
+})
+
+test(`Should handle HTTP_FORBIDDEN`, done => {
+  const url =
+    'https://artesimulcast.akamaized.net/hls/live/2030993/artelive_de/index.m3u8'
+  checker
+    .checkStream({ url, timeout: 2000 })
+    .then(results => {
+      expect(results.status.code).toBe('HTTP_FORBIDDEN')
+      expect(results.status.message).toBe('HTTP 403 Forbidden')
+      done()
+    })
+    .catch(done)
 })

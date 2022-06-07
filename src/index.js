@@ -2,9 +2,12 @@ require('colors')
 const chunk = require('lodash.chunk')
 const { isUri } = require('valid-url')
 const commandExists = require('command-exists')
-const helper = require('./helper')
+const { parsePlaylist } = require('./parser')
+const cache = require('./cache')
 const Logger = require('./Logger')
 const cpus = require('os').cpus()
+const { loadStream } = require('./http')
+const ffprobe = require('./ffprobe')
 
 const defaultConfig = {
   debug: false,
@@ -44,8 +47,8 @@ class IPTVChecker {
 
     logger.debug({ config })
 
-    const playlist = await helper.parsePlaylist(input).catch(err => {
-      throw err
+    const playlist = await parsePlaylist(input).catch(err => {
+      throw new Error(err)
     })
 
     await config.setUp(playlist)
@@ -54,12 +57,12 @@ class IPTVChecker {
       .map(item => {
         if (!isUri(item.url)) return null
 
-        if (helper.checkCache(item)) {
+        if (cache.check(item)) {
           duplicates.push(item)
 
           return null
         } else {
-          helper.addToCache(item)
+          cache.add(item)
 
           return item
         }
@@ -93,16 +96,26 @@ class IPTVChecker {
   }
 
   async checkStream(item) {
-    await this.config.beforeEach(item)
+    const { config, logger } = this
 
-    item.status = await helper.checkItem.call(this, item)
+    await config.beforeEach(item)
+
+    item.status = await loadStream(item, config, logger)
+      .then(status => {
+        if (status) return status
+        return ffprobe(item, config, logger)
+      })
+      .catch(err => {
+        throw new Error(err)
+      })
+
     if (item.status.ok) {
-      this.logger.debug(`OK: ${item.url}`.green)
+      logger.debug(`OK: ${item.url}`.green)
     } else {
-      this.logger.debug(`FAILED: ${item.url} (${item.status.message})`.red)
+      logger.debug(`FAILED: ${item.url} (${item.status.message})`.red)
     }
 
-    await this.config.afterEach(item)
+    await config.afterEach(item)
 
     return item
   }

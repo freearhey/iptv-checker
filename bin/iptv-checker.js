@@ -21,9 +21,7 @@ const stats = {
 argv
   .version(version, '-v, --version')
   .name('iptv-checker')
-  .description(
-    'Utility to check .m3u playlists entries. If no file path or url is provided, this program will attempt to read stdin'
-  )
+  .description('Utility to check M3U playlists entries')
   .usage('[options] [file-or-url]')
   .option('-o, --output <output>', 'Path to output directory')
   .option(
