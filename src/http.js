@@ -77,7 +77,7 @@ function loadStream(item, config, logger) {
 		.catch(err => {
 			const code = parseError(err, config, logger)
 
-			return Promise.resolve({
+			return Promise.reject({
 				ok: false,
 				code,
 				message: errors[code],

@@ -101,14 +101,8 @@ class IPTVChecker {
     await config.beforeEach(item)
 
     item.status = await loadStream(item, config, logger)
-      .then(status => {
-        if (status) return status
-
-        return ffprobe(item, config, logger)
-      })
-      .catch(err => {
-        throw new Error(err)
-      })
+      .then(() => ffprobe(item, config, logger))
+      .catch(status => status)
 
     if (item.status.ok) {
       logger.debug(`OK: ${item.url}`.green)
