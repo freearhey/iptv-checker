@@ -43,6 +43,7 @@
 | HTTP_PARSE_ERROR                     | HTTP Parse Error                         |
 | HTTP_NETWORK_UNREACHABLE             | HTTP Network Unreachable                 |
 | HTTP_ECONNRESET                      | HTTP Connection Reset                    |
+| HTTP_CONNECTION_REFUSED              | HTTP Connection Refused                  |
 | HTTP_UNDEFINED                       | HTTP Undefined Error                     |
 | FFMPEG_INPUT_OUTPUT_ERROR            | FFMPEG Input/output Error                |
 | FFMPEG_PROTOCOL_NOT_FOUND            | FFMPEG Protocol Not Found                |

@@ -48,6 +48,7 @@ module.exports = {
 	HTT_PARSE_ERROR: 'HTTP Parse Error',
 	HTT_NETWORK_UNREACHABLE: 'HTTP Network Unreachable',
 	HTT_ECONNRESET: 'HTTP Connection Reset',
+	HTTP_CONNECTION_REFUSED: 'HTTP Connection Refused',
 	HTTP_UNDEFINED: 'HTTP Undefined Error',
 
 	FFMPEG_INPUT_OUTPUT_ERROR: 'FFMPEG Input/output Error',
@@ -55,5 +56,5 @@ module.exports = {
 	FFMPEG_INVALID_DATA: 'FFMPEG Invalid Data',
 	FFMPEG_PROCESS_TIMEOUT: 'FFMPEG Process Timeout',
 	FFMPEG_UNDEFINED: 'FFMPEG Undefined Error',
-	FFMPEG_STREAMS_NOT_FOUND: 'Streams Not Found',
+	FFMPEG_STREAMS_NOT_FOUND: 'FFMPEG Streams Not Found',
 }

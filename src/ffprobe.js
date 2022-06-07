@@ -142,6 +142,8 @@ function parseError(output, item, config, logger) {
       return 'HTTP_FORBIDDEN'
     case 'Server returned 404 Not Found':
       return 'HTTP_NOT_FOUND'
+    case 'Connection refused':
+      return 'HTTP_CONNECTION_REFUSED'
   }
 
   logger.debug('FFMPEG_UNDEFINED')
