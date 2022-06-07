@@ -89,10 +89,10 @@ async function init() {
 
     stats.online = checked.items.filter(item => item.status.ok).length
     stats.offline = checked.items.filter(
-      item => !item.status.ok && item.status.reason !== `Duplicate`
+      item => !item.status.ok && item.status.code !== `DUPLICATE`
     ).length
     stats.duplicates = checked.items.filter(
-      item => !item.status.ok && item.status.reason === `Duplicate`
+      item => !item.status.ok && item.status.code === `DUPLICATE`
     ).length
 
     const result = [
@@ -113,10 +113,10 @@ async function init() {
 function afterEach(item) {
   if (item.status.ok) {
     writeToFile(onlineFile, item)
-  } else if (item.status.reason === `Duplicate`) {
+  } else if (item.status.code === `DUPLICATE`) {
     writeToFile(duplicatesFile, item)
   } else {
-    writeToFile(offlineFile, item, item.status.reason)
+    writeToFile(offlineFile, item, item.status.message)
   }
 
   if (!config.debug) {

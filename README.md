@@ -49,23 +49,23 @@ var checker = require('iptv-checker')
 
 // using playlist url
 checker.checkPlaylist('https://some-playlist.lol/list.m3u').then(results => {
-	console.log(results)
+  console.log(results)
 })
 
 // using local path
 checker.checkPlaylist('path/to/playlist.m3u').then(results => {
-	console.log(results)
+  console.log(results)
 })
 
 // using playlist as string
 checker.checkPlaylist(string).then(results => {
-	console.log(results)
+  console.log(results)
 })
 ```
 
 #### Results
 
-*On success:*
+_On success:_
 
 ```js
 {
@@ -184,7 +184,7 @@ checker.checkPlaylist(string).then(results => {
 }
 ```
 
-*On error:*
+_On error:_
 
 ```js
 {
@@ -222,13 +222,18 @@ checker.checkPlaylist(string).then(results => {
       timeshift: '',
       status: {
         ok: false,
-        reason: 'Operation timed out',
+        code: ,
+        message: 'Request Timeout',
       }
     },
     //...
   ]
 }
 ```
+
+#### Error codes
+
+A full list of the error codes used and their descriptions can be found [here](.readme/errors.md).
 
 ## Contribution
 

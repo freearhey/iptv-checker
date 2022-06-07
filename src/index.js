@@ -41,9 +41,12 @@ class IPTVChecker {
     const duplicates = []
     const config = this.config
     const logger = this.logger
-    const playlist = await helper.parsePlaylist(input)
 
     logger.debug({ config })
+
+    const playlist = await helper.parsePlaylist(input).catch(err => {
+      throw err
+    })
 
     await config.setUp(playlist)
 
@@ -64,7 +67,7 @@ class IPTVChecker {
       .filter(Boolean)
 
     for (let item of duplicates) {
-      item.status = { ok: false, reason: `Duplicate` }
+      item.status = { ok: false, code: 'DUPLICATE', message: `Duplicate` }
       await config.afterEach(item)
       results.push(item)
     }

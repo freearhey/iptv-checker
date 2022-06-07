@@ -1,9 +1,5 @@
 const { readFileSync } = require('fs')
 const IPTVChecker = require('./../src/index')
-const playlistPath = `${__dirname}/input/dummy.m3u`
-const playlistFile = readFileSync(playlistPath, {
-  encoding: 'utf8',
-})
 const checker = new IPTVChecker({ timeout: 2000, parallel: 1 })
 
 function resultTester(result) {
@@ -11,7 +7,8 @@ function resultTester(result) {
     return (
       Reflect.has(item, `status`) &&
       Reflect.has(item.status, `ok`) &&
-      (Reflect.has(item.status, `reason`) ||
+      ((Reflect.has(item.status, `message`) &&
+        Reflect.has(item.status, `code`)) ||
         (Reflect.has(item.status, `metadata`) &&
           Reflect.has(item.status.metadata, `requests`)))
     )
@@ -20,45 +17,113 @@ function resultTester(result) {
 
 jest.setTimeout(60000)
 
-test(`Should process a playlist URL`, async () => {
+test(`Should process a playlist URL`, done => {
   const url = 'https://iptv-org.github.io/iptv/languages/amh.m3u'
-  const results = await checker.checkPlaylist(url)
-
-  expect(resultTester(results)).toBeTruthy()
+  checker
+    .checkPlaylist(url)
+    .then(results => {
+      expect(resultTester(results)).toBeTruthy()
+      done()
+    })
+    .catch(done)
 })
 
-test(`Should process a stream URL`, async () => {
+test(`Should process a stream URL`, done => {
   const url =
     'http://cdn.theoplayer.com/video/elephants-dream/playlist-single-audio.m3u8'
-  const results = await checker.checkStream({ url, timeout: 5000 })
-
-  expect(results.status.ok).toBeTruthy()
+  checker
+    .checkStream({ url, timeout: 5000 })
+    .then(results => {
+      expect(results.status.ok).toBeTruthy()
+      done()
+    })
+    .catch(done)
 })
 
-test(`Should process a relative playlist file path`, async () => {
+test(`Should handle error HTTP_UNAVAILABLE_FOR_LEGAL_REASONS`, done => {
+  const url = 'https://mock.codes/451'
+  checker
+    .checkStream({ url, timeout: 2000 })
+    .then(results => {
+      expect(results.status.code).toBe('HTTP_UNAVAILABLE_FOR_LEGAL_REASONS')
+      expect(results.status.message).toBe('Unavailable For Legal Reasons')
+      done()
+    })
+    .catch(done)
+})
+
+test(`Should handle error HTTP_REQUEST_TIMEOUT`, done => {
+  const url = 'http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8'
+  checker
+    .checkStream({ url, timeout: 2000 })
+    .then(results => {
+      expect(results.status.code).toBe('HTTP_REQUEST_TIMEOUT')
+      expect(results.status.message).toBe('Request Timeout')
+      done()
+    })
+    .catch(done)
+})
+
+test(`Should handle error HTTP_FORBIDDEN`, done => {
+  const url =
+    'https://artesimulcast.akamaized.net/hls/live/2030993/artelive_de/index.m3u8'
+  checker
+    .checkStream({ url, timeout: 2000 })
+    .then(results => {
+      expect(results.status.code).toBe('HTTP_FORBIDDEN')
+      expect(results.status.message).toBe('Forbidden')
+      done()
+    })
+    .catch(done)
+})
+
+test(`Should process a relative playlist file path`, done => {
   const path = 'test/input/dummy.m3u'
-  const results = await checker.checkPlaylist(path)
-
-  expect(resultTester(results)).toBeTruthy()
+  checker
+    .checkPlaylist(path)
+    .then(results => {
+      expect(resultTester(results)).toBeTruthy()
+      done()
+    })
+    .catch(done)
 })
 
-test(`Should process an absolute playlist file path`, async () => {
-  const results = await checker.checkPlaylist(playlistPath)
-
-  expect(resultTester(results)).toBeTruthy()
+test(`Should process an absolute playlist file path`, done => {
+  const playlistPath = `${__dirname}/input/dummy.m3u`
+  checker
+    .checkPlaylist(playlistPath)
+    .then(results => {
+      expect(resultTester(results)).toBeTruthy()
+      done()
+    })
+    .catch(done)
 })
 
-test(`Should process a playlist data Buffer`, async () => {
+test(`Should process a playlist data Buffer`, done => {
+  const playlistFile = readFileSync(`${__dirname}/input/dummy.m3u`, {
+    encoding: 'utf8',
+  })
   const playlistBuffer = Buffer.from(playlistFile)
-  const results = await checker.checkPlaylist(playlistBuffer)
-
-  expect(resultTester(results)).toBeTruthy()
+  checker
+    .checkPlaylist(playlistBuffer)
+    .then(results => {
+      expect(resultTester(results)).toBeTruthy()
+      done()
+    })
+    .catch(done)
 })
 
-test(`Should process a playlist data string`, async () => {
-  const results = await checker.checkPlaylist(playlistFile)
-
-  expect(resultTester(results)).toBeTruthy()
+test(`Should process a playlist data string`, done => {
+  const playlistFile = readFileSync(`${__dirname}/input/dummy.m3u`, {
+    encoding: 'utf8',
+  })
+  checker
+    .checkPlaylist(playlistFile)
+    .then(results => {
+      expect(resultTester(results)).toBeTruthy()
+      done()
+    })
+    .catch(done)
 })
 
 test(`Should throw with invalid input`, async () => {
