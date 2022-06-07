@@ -34,10 +34,14 @@ playlistClient.interceptors.response.use(
 )
 
 const streamClient = axios.create({
+  method: 'GET',
   timeout: 60000,
   httpsAgent: new https.Agent({
     rejectUnauthorized: false,
   }),
+  validateStatus: function (status) {
+    return (status >= 200 && status < 400) || status === 405
+  },
 })
 curlirize(streamClient, (result, err) => {
   const { command } = result
@@ -51,7 +55,7 @@ module.exports = {
   checkItem,
 }
 
-async function parsePlaylist(input, logger) {
+async function parsePlaylist(input) {
   if (input instanceof Object && Reflect.has(input, `items`)) return input
 
   let data = input
@@ -117,7 +121,7 @@ function preflightRequest(item, config) {
     headers['Referer'] = referer
   }
 
-  return streamClient.head(item.url, {
+  return streamClient(item.url, {
     timeout,
     headers,
     curlirize: config.debug,
@@ -142,7 +146,7 @@ function checkItem(item) {
 
 function ffprobe(item, config, logger) {
   const command = buildCommand(item, config)
-  logger.debug(`EXECUTING: "${command}"`)
+  logger.debug(`FFMPEG: "${command}"`)
   const timeout = item.timeout || config.timeout
   return execAsync(command, { timeout })
     .then(({ stdout, stderr }) => {
@@ -151,8 +155,8 @@ function ffprobe(item, config, logger) {
         if (!metadata.streams.length) {
           return {
             ok: false,
-            code: 'STREAM_NOT_FOUND',
-            message: errors['STREAM_NOT_FOUND'],
+            code: 'STREAMS_NOT_FOUND',
+            message: errors['STREAMS_NOT_FOUND'],
           }
         }
         const results = parseStderr(stderr)
@@ -163,8 +167,8 @@ function ffprobe(item, config, logger) {
 
       return {
         ok: false,
-        code: 'UNKNOWN',
-        message: errors['UNKNOWN'],
+        code: 'FFMPEG_UNKNOWN',
+        message: errors['FFMPEG_UNKNOWN'],
       }
     })
     .catch(err => {
@@ -249,25 +253,6 @@ function isJSON(str) {
 
 function parseHttpError(status) {
   const http = {
-    100: 'HTTP_CONTINUE',
-    101: 'HTTP_SWITCHING_PROTOCOLS',
-    102: 'HTTP_PROCESSING',
-    200: 'HTTP_OK',
-    201: 'HTTP_CREATED',
-    202: 'HTTP_ACCEPTED',
-    203: 'HTTP_NON_AUTHORITATIVE_INFORMATION',
-    204: 'HTTP_NO_CONTENT',
-    205: 'HTTP_RESET_CONTENT',
-    206: 'HTTP_PARTIAL_CONTENT',
-    207: 'HTTP_MULTI_STATUS',
-    300: 'HTTP_MULTIPLE_CHOICES',
-    301: 'HTTP_MOVED_PERMANENTLY',
-    302: 'HTTP_MOVED_TEMPORARILY',
-    303: 'HTTP_SEE_OTHER',
-    304: 'HTTP_NOT_MODIFIED',
-    305: 'HTTP_USE_PROXY',
-    307: 'HTTP_TEMPORARY_REDIRECT',
-    308: 'HTTP_PERMANENT_REDIRECT',
     400: 'HTTP_BAD_REQUEST',
     401: 'HTTP_UNAUTHORIZED',
     402: 'HTTP_PAYMENT_REQUIRED',
@@ -313,10 +298,33 @@ function parseHttpError(status) {
 function parseFFmpegError(output, item) {
   const url = item.url
   const line = output.split('\n').find(l => l.startsWith(url))
-  const message = line ? line.replace(`${url}: `, '') : null
-  const code = Object.keys(errors).find(k => errors[k] === message)
+  const err = line ? line.replace(`${url}: `, '') : null
 
-  return code || 'HTTP_REQUEST_TIMEOUT'
+  if (!err) {
+    console.log('FFMPEG_PROCESS_TIMEOUT', output)
+    return 'FFMPEG_PROCESS_TIMEOUT'
+  }
+
+  switch (err) {
+    case 'Protocol not found':
+      return 'FFMPEG_PROTOCOL_NOT_FOUND'
+    case 'Input/output error':
+      return 'FFMPEG_INPUT_OUTPUT_ERROR'
+    case 'Invalid data found when processing input':
+      return 'FFMPEG_INVALID_DATA'
+    case 'Server returned 400 Bad Request':
+      return 'HTTP_BAD_REQUEST'
+    case 'Server returned 401 Unauthorized (authorization failed)':
+      return 'HTTP_UNAUTHORIZED'
+    case 'Server returned 403 Forbidden (access denied)':
+      return 'HTTP_FORBIDDEN'
+    case 'Server returned 404 Not Found':
+      return 'HTTP_NOT_FOUND'
+  }
+
+  console.log('FFMPEG_UNDEFINED', err)
+
+  return 'FFMPEG_UNDEFINED'
 }
 
 function parseAxiosError(err, logger) {
@@ -330,9 +338,17 @@ function parseAxiosError(err, logger) {
     return 'HTTP_INTERNAL_SERVER_ERROR'
   } else if (err.code === 'EPROTO') {
     return 'HTTP_PROTOCOL_ERROR'
+  } else if (err.code === 'ENETUNREACH') {
+    return 'HTTP_NETWORK_UNREACHABLE'
+  } else if (err.code === 'ENOTFOUND') {
+    return 'HTTP_NOT_FOUND'
+  } else if (err.code === 'ECONNRESET') {
+    return 'HTTP_ECONNRESET'
+  } else if (err.code.startsWith('HPE')) {
+    return 'HTTP_PARSE_ERROR'
   }
 
-  logger.debug(err)
+  console.log('HTTP_UNDEFINED', err)
 
-  return 'UNKNOWN'
+  return 'HTTP_UNDEFINED'
 }

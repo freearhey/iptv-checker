@@ -52,6 +52,17 @@ test(`Should handle error HTTP_UNAVAILABLE_FOR_LEGAL_REASONS`, done => {
     .catch(done)
 })
 
+test.only(`Should handle request with forbidden HEAD method`, done => {
+  const url = 'https://live.ecomservice.bg/hls/stream.m3u8'
+  checker
+    .checkStream({ url, timeout: 2000 })
+    .then(results => {
+      expect(results.status.ok).toBe(true)
+      done()
+    })
+    .catch(done)
+})
+
 test(`Should handle error HTTP_REQUEST_TIMEOUT`, done => {
   const url = 'http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8'
   checker

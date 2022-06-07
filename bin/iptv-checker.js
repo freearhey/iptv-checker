@@ -51,7 +51,7 @@ argv
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = !+argv.insecure
 
 const config = {
-  debug: argv.debug,
+  debug: argv.debug || false,
   insecure: argv.insecure,
   userAgent: argv.userAgent,
   timeout: parseInt(argv.timeout),

@@ -44,7 +44,7 @@ class IPTVChecker {
 
     logger.debug({ config })
 
-    const playlist = await helper.parsePlaylist(input, logger).catch(err => {
+    const playlist = await helper.parsePlaylist(input).catch(err => {
       throw err
     })
 
