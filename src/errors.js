@@ -1,5 +1,9 @@
+// HTTP: https://github.com/prettymuchbryce/http-status-codes/blob/master/README.md#codes
+// ffmpeg: https://github.com/FFmpeg/FFmpeg/blob/636631d9db82f5e86330ab42dacc8a106684b349/libavutil/error.c
+// axios: https://github.com/axios/axios/blob/v1.x/lib/core/AxiosError.js
+// linux: https://www.man7.org/linux/man-pages/man3/errno.3.html
+
 module.exports = {
-	// HTTP
 	HTTP_MULTIPLE_CHOICES: 'Multiple Choices',
 	HTTP_MOVED_PERMANENTLY: 'Moved Permanently',
 	HTTP_MOVED_TEMPORARILY: 'Moved Temporarily',
@@ -45,8 +49,8 @@ module.exports = {
 	HTTP_HTTP_VERSION_NOT_SUPPORTED: 'HTTP Version Not Supported',
 	HTTP_INSUFFICIENT_STORAGE: 'Insufficient Storage',
 	HTTP_NETWORK_AUTHENTICATION_REQUIRED: 'Network Authentication Required',
+	HTTP_PROTOCOL_ERROR: 'Protocol error',
 
-	// ffmpeg
 	STREAM_NOT_FOUND: 'Stream not found',
 	UNKNOWN: 'Unknown error occurred',
 }

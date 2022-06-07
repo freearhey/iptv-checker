@@ -130,7 +130,7 @@ function checkItem(item) {
   return preflightRequest(item, config)
     .then(() => ffprobe(item, config, logger))
     .catch(err => {
-      const code = parseAxiosError(err)
+      const code = parseAxiosError(err, logger)
 
       return {
         ok: false,
@@ -319,7 +319,7 @@ function parseFFmpegError(output, item) {
   return code || 'HTTP_REQUEST_TIMEOUT'
 }
 
-function parseAxiosError(err) {
+function parseAxiosError(err, logger) {
   if (err.response) {
     return parseHttpError(err.response.status)
   } else if (err.message.startsWith('timeout')) {
@@ -328,9 +328,11 @@ function parseAxiosError(err) {
     return 'HTTP_INTERNAL_SERVER_ERROR'
   } else if (err.message.includes('unable to verify the first certificate')) {
     return 'HTTP_INTERNAL_SERVER_ERROR'
+  } else if (err.code === 'EPROTO') {
+    return 'HTTP_PROTOCOL_ERROR'
   }
 
-  console.log('UNKNOWN', err)
+  logger.debug(err)
 
   return 'UNKNOWN'
 }
