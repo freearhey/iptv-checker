@@ -146,6 +146,8 @@ function parseError(output, item, config, logger) {
       return 'HTTP_CONNECTION_REFUSED'
     case "Can't assign requested address":
       return 'HTTP_CANNOT_ASSIGN_REQUESTED_ADDRESS'
+    case 'Server returned 4XX Client Error, but not one of 40{0,1,3,4}':
+      return 'HTTP_4XX_CLIENT_ERROR'
   }
 
   logger.debug('FFMPEG_UNDEFINED')
