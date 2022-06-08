@@ -144,6 +144,8 @@ function parseError(output, item, config, logger) {
       return 'HTTP_NOT_FOUND'
     case 'Connection refused':
       return 'HTTP_CONNECTION_REFUSED'
+    case "Can't assign requested address":
+      return 'HTTP_CANNOT_ASSIGN_REQUESTED_ADDRESS'
   }
 
   logger.debug('FFMPEG_UNDEFINED')

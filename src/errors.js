@@ -50,6 +50,7 @@ module.exports = {
 	HTT_ECONNRESET: 'HTTP Connection Reset',
 	HTTP_CONNECTION_REFUSED: 'HTTP Connection Refused',
 	HTTP_UNDEFINED: 'HTTP Undefined Error',
+	HTTP_CANNOT_ASSIGN_REQUESTED_ADDRESS: 'HTTP Cannot Assign Requested Address',
 
 	FFMPEG_INPUT_OUTPUT_ERROR: 'FFMPEG Input/output Error',
 	FFMPEG_PROTOCOL_NOT_FOUND: 'FFMPEG Protocol Not Found',
