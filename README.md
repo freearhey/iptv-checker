@@ -222,8 +222,8 @@ _On error:_
       timeshift: '',
       status: {
         ok: false,
-        code: ,
-        message: 'Request Timeout',
+        code: 'HTTP_REQUEST_TIMEOUT',
+        message: 'HTTP 408 Request Timeout',
       }
     },
     //...
