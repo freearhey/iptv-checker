@@ -114,17 +114,6 @@ test(`Should throw on invalid fetched input data`, async () => {
   )
 })
 
-test(`Should handle request with forbidden HEAD method`, done => {
-  const url = 'https://live.ecomservice.bg/hls/stream.m3u8'
-  checker
-    .checkStream({ url, timeout: 2000 })
-    .then(results => {
-      expect(results.status.ok).toBe(true)
-      done()
-    })
-    .catch(done)
-})
-
 test(`Should handle HTTP_REQUEST_TIMEOUT`, done => {
   const url = 'http://62.210.141.179:8000/live/ibrahim/123456/456.m3u8'
   checker
