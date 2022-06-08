@@ -231,7 +231,7 @@ _On error:_
 }
 ```
 
-#### Error codes
+### Error codes
 
 A full list of the error codes used and their descriptions can be found [here](.readme/errors.md).
 
