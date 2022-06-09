@@ -33,7 +33,7 @@ playlistClient.interceptors.response.use(
 const streamClient = axios.create({
   method: 'GET',
   timeout: 60000,
-  maxContentLength: 5 * 1024 * 1024,
+  maxContentLength: 100 * 1024,
   httpsAgent: new https.Agent({
     rejectUnauthorized: false,
   }),
