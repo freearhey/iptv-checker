@@ -13,7 +13,6 @@ const defaultConfig = {
   debug: false,
   userAgent: null,
   timeout: 60000,
-  maxContentLength: 5 * 1024 * 1024,
   parallel: cpus.length,
   setUp: playlist => {}, // eslint-disable-line
   afterEach: item => {}, // eslint-disable-line
