@@ -46,7 +46,6 @@
 | HTTP_CONNECTION_REFUSED              | HTTP Connection Refused                  |
 | HTTP_CANNOT_ASSIGN_REQUESTED_ADDRESS | HTTP Cannot Assign Requested Address     |
 | HTTP_4XX_CLIENT_ERROR                | HTTP 4XX Client Error                    |
-| HTTP_MAX_CONTENT_LENGTH_EXCEEDED     | HTTP Max Content Length Exceeded         |
 | HTTP_UNDEFINED                       | HTTP Undefined Error                     |
 | FFMPEG_INPUT_OUTPUT_ERROR            | FFMPEG Input/output Error                |
 | FFMPEG_PROTOCOL_NOT_FOUND            | FFMPEG Protocol Not Found                |
