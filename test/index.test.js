@@ -138,3 +138,16 @@ test(`Should handle HTTP_FORBIDDEN`, done => {
     })
     .catch(done)
 })
+
+test(`Should handle HTTP_MAX_CONTENT_LENGTH_EXCEEDED`, done => {
+  const url =
+    'https://artesimulcast.akamaized.net/hls/live/2030993/artelive_de/index.m3u8'
+  checker
+    .checkStream({ url, timeout: 2000, maxContentLength: 100 })
+    .then(results => {
+      expect(results.status.code).toBe('HTTP_MAX_CONTENT_LENGTH_EXCEEDED')
+      expect(results.status.message).toBe('HTTP Max Content Length Exceeded')
+      done()
+    })
+    .catch(done)
+})
