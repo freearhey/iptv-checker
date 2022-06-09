@@ -29,10 +29,9 @@ test(`Should process a playlist URL`, done => {
 })
 
 test(`Should process a stream URL`, done => {
-  const url =
-    'http://cdn.theoplayer.com/video/elephants-dream/playlist-single-audio.m3u8'
+  const url = 'https://live-hls-web-aja.getaj.net/AJA/index.m3u8'
   checker
-    .checkStream({ url, timeout: 5000 })
+    .checkStream({ url, timeout: 10000 })
     .then(results => {
       expect(results.status.ok).toBeTruthy()
       done()
@@ -139,14 +138,14 @@ test(`Should handle HTTP_FORBIDDEN`, done => {
     .catch(done)
 })
 
-test(`Should handle HTTP_MAX_CONTENT_LENGTH_EXCEEDED`, done => {
+test(`Should use timeout parameter`, done => {
   const url =
-    'https://artesimulcast.akamaized.net/hls/live/2030993/artelive_de/index.m3u8'
+    'http://hbbtvlive.v3.tvp.pl/hbbtvlive/livestream.php?app_id=tvpbialystok'
   checker
-    .checkStream({ url, timeout: 2000, maxContentLength: 100 })
+    .checkStream({ url, timeout: 100 })
     .then(results => {
-      expect(results.status.code).toBe('HTTP_MAX_CONTENT_LENGTH_EXCEEDED')
-      expect(results.status.message).toBe('HTTP Max Content Length Exceeded')
+      expect(results.status.code).toBe('HTTP_REQUEST_TIMEOUT')
+      expect(results.status.message).toBe('HTTP 408 Request Timeout')
       done()
     })
     .catch(done)
