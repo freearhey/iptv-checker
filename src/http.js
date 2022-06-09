@@ -2,6 +2,7 @@ const curlirize = require('axios-curlirize')
 const axios = require('axios')
 const https = require('https')
 const errors = require('./errors')
+const CancelToken = axios.CancelToken
 
 module.exports.loadPlaylist = loadPlaylist
 module.exports.loadStream = loadStream
@@ -32,6 +33,7 @@ playlistClient.interceptors.response.use(
 const streamClient = axios.create({
   method: 'GET',
   timeout: 60000,
+  maxContentLength: 5 * 1024 * 1024,
   httpsAgent: new https.Agent({
     rejectUnauthorized: false,
   }),
@@ -59,7 +61,6 @@ function loadStream(item, config, logger) {
   const referer =
     item.http && item.http.referrer ? item.http.referrer : config.httpReferer
   const timeout = item.timeout || config.timeout
-  const maxContentLength = item.maxContentLength || config.maxContentLength
 
   const headers = {}
   if (userAgent) {
@@ -69,15 +70,23 @@ function loadStream(item, config, logger) {
     headers['Referer'] = referer
   }
 
+  let source = CancelToken.source()
+  setTimeout(() => {
+    source.cancel('timeout')
+  }, timeout)
+
   return streamClient(item.url, {
     timeout,
-    maxContentLength,
     headers,
+    cancelToken: source.token,
     curlirize: config.debug,
   })
     .then(() => Promise.resolve())
     .catch(err => {
       const code = parseError(err, config, logger)
+      if (code === 'HTTP_MAX_CONTENT_LENGTH_EXCEEDED') {
+        return Promise.resolve()
+      }
 
       return Promise.reject({
         ok: false,
