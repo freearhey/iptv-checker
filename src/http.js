@@ -59,6 +59,7 @@ function loadStream(item, config, logger) {
   const referer =
     item.http && item.http.referrer ? item.http.referrer : config.httpReferer
   const timeout = item.timeout || config.timeout
+  const maxContentLength = item.maxContentLength || config.maxContentLength
 
   const headers = {}
   if (userAgent) {
@@ -70,6 +71,7 @@ function loadStream(item, config, logger) {
 
   return streamClient(item.url, {
     timeout,
+    maxContentLength,
     headers,
     curlirize: config.debug,
   })
@@ -88,10 +90,12 @@ function loadStream(item, config, logger) {
 function parseError(err, config, logger) {
   if (err.response) {
     return parseResponseStatus(err.response.status)
-  } else if (err.message.startsWith('timeout')) {
+  } else if (err.message && err.message.startsWith('timeout')) {
     return 'HTTP_REQUEST_TIMEOUT'
-  } else if (err.message.includes('ECONNREFUSED')) {
+  } else if (err.message && err.message.includes('ECONNREFUSED')) {
     return 'HTTP_INTERNAL_SERVER_ERROR'
+  } else if (err.message && err.message.startsWith('maxContentLength')) {
+    return 'HTTP_MAX_CONTENT_LENGTH_EXCEEDED'
   } else if (err.code === 'EPROTO') {
     return 'HTTP_PROTOCOL_ERROR'
   } else if (err.code === 'ENETUNREACH') {
