@@ -38,7 +38,7 @@ Arguments:
 - `-k, --insecure`: allow insecure connections when using SSL
 - `-p, --parallel`: Batch size of channels to check concurrently (default to 1)
 
-### Node.js
+### Module
 
 ```sh
 npm install iptv-checker
