@@ -79,8 +79,6 @@ _On success:_
       tvg: {
         id: 'KBSVAssyriaSat.us',
         name: '',
-        language: 'Assyrian Neo-Aramaic;English',
-        country: 'US',
         logo: 'https://i.imgur.com/zEWSSdf.jpg',
         url: '',
         rec: ''
@@ -93,7 +91,7 @@ _On success:_
         'user-agent': ''
       },
       url: 'http://66.242.170.53/hls/live/temp/index.m3u8',
-      raw: '#EXTINF:-1 tvg-id="KBSVAssyriaSat.us" tvg-country="US" tvg-language="Assyrian Neo-Aramaic;English" tvg-logo="https://i.imgur.com/zEWSSdf.jpg" group-title="General",KBSV/AssyriaSat (720p) [Not 24/7]\r\nhttp://66.242.170.53/hls/live/temp/index.m3u8',
+      raw: '#EXTINF:-1 tvg-id="KBSVAssyriaSat.us" tvg-logo="https://i.imgur.com/zEWSSdf.jpg" group-title="General",KBSV/AssyriaSat (720p) [Not 24/7]\r\nhttp://66.242.170.53/hls/live/temp/index.m3u8',
       line: 2,
       catchup: {
         type: '',
@@ -198,8 +196,6 @@ _On error:_
       tvg: {
         id: 'AddisTV.et',
         name: '',
-        language: 'Amharic',
-        country: 'ET',
         logo: 'https://i.imgur.com/KAg6MOI.png',
         url: '',
         rec: ''
@@ -212,7 +208,7 @@ _On error:_
         'user-agent': ''
       },
       url: 'https://rrsatrtmp.tulix.tv/addis1/addis1multi.smil/playlist.m3u8',
-      raw: '#EXTINF:-1 tvg-id="AddisTV.et" tvg-country="ET" tvg-language="Amharic" tvg-logo="https://i.imgur.com/KAg6MOI.png" group-title="Undefined",Addis TV (720p)\\r\\nhttps://rrsatrtmp.tulix.tv/addis1/addis1multi.smil/playlist.m3u8',
+      raw: '#EXTINF:-1 tvg-id="AddisTV.et" tvg-logo="https://i.imgur.com/KAg6MOI.png" group-title="Undefined",Addis TV (720p)\\r\\nhttps://rrsatrtmp.tulix.tv/addis1/addis1multi.smil/playlist.m3u8',
       line: 2,
       catchup: {
         type: '',
