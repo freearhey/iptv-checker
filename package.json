@@ -1,6 +1,6 @@
 {
   "name": "iptv-checker",
-  "version": "0.24.5",
+  "version": "0.25.0",
   "description": "Node.js CLI tool for checking links in IPTV playlists",
   "main": "src/index.js",
   "preferGlobal": true,
@@ -37,7 +37,7 @@
     "commander": "^2.20.0",
     "dateformat": "^3.0.3",
     "get-stdin": "^7.0.0",
-    "iptv-playlist-parser": "^0.11.0",
+    "iptv-playlist-parser": "^0.12.0",
     "jest": "^27.0.6",
     "lodash.chunk": "^4.2.0",
     "progress": "^2.0.3",
