@@ -1,7 +1,7 @@
 require('colors')
-const chunk = require('lodash.chunk')
 const { isUri } = require('valid-url')
 const commandExists = require('command-exists')
+const eachLimit = require('async/eachLimit')
 const { parsePlaylist } = require('./parser')
 const cache = require('./cache')
 const Logger = require('./Logger')
@@ -82,14 +82,10 @@ class IPTVChecker {
         results.push(checkedItem)
       }
     } else {
-      const chunkedItems = chunk(items, +config.parallel)
-
-      for (let [...chunk] of chunkedItems) {
-        const chunkResults = await Promise.all(
-          chunk.map(item => this.checkStream(item))
-        )
-        results.push(...chunkResults)
-      }
+      await eachLimit(items, +config.parallel, async item => {
+        const result = await this.checkStream(item)
+        results.push(result)
+      })
     }
 
     return playlist
