@@ -7,8 +7,8 @@ class Logger {
     this.print(msg)
   }
 
-  error(msg) {
-    this.print(msg.red)
+  error(err) {
+    this.print(err)
   }
 
   debug(msg) {
