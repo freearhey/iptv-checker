@@ -123,10 +123,6 @@ function parseError(output, item, config, logger) {
   const line = output.split('\n').find(l => l.startsWith(url))
   const err = line ? line.replace(`${url}: `, '') : null
 
-  if (!err) {
-    return 'FFMPEG_PROCESS_TIMEOUT'
-  }
-
   switch (err) {
     case 'Protocol not found':
       return 'FFMPEG_PROTOCOL_NOT_FOUND'
