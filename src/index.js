@@ -86,7 +86,7 @@ class IPTVChecker {
         results.push(checkedItem)
       }
     } else {
-      items.all_checked = false
+      items.cur_index = 0
       const chunkResults = await Promise.all(
         Array(+config.parallel).fill().map(async _ => await this.checkTrunkStream(items))
       )
@@ -97,12 +97,13 @@ class IPTVChecker {
   }
 
   async checkTrunkStream(items, chunkResults = []) {
-    if (items.all_checked) return chunkResults
-    const item = items.find(e => e.state === 0)
-    if (!item) {
-      items.all_checked = true
-      return chunkResults
+    let item = null
+    while (items.cur_index < items.length) {
+      item = items[items.cur_index]
+      if (item.state === 0) break
+      items.cur_index++
     }
+    if (items.cur_index >= items.length) return chunkResults
     item.state = 1
     const result = await this.checkStream(item)
     item.state = 2
