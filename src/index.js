@@ -69,7 +69,10 @@ class IPTVChecker {
       })
       .filter(Boolean)
 
+    // set items state: 0-pending, 1-checking, 2-checked, 4-duplicate
+    items.forEach(e => e.state = 0)
     for (let item of duplicates) {
+      item.state = 4
       item.status = { ok: false, code: 'DUPLICATE', message: `Duplicate` }
       await config.afterEach(item)
       results.push(item)
@@ -77,22 +80,35 @@ class IPTVChecker {
 
     if (+config.parallel === 1) {
       for (let item of items) {
+        item.state = 1
         const checkedItem = await this.checkStream(item)
-
+        item.state = 2
         results.push(checkedItem)
       }
     } else {
-      const chunkedItems = chunk(items, +config.parallel)
-
-      for (let [...chunk] of chunkedItems) {
-        const chunkResults = await Promise.all(
-          chunk.map(item => this.checkStream(item))
-        )
-        results.push(...chunkResults)
-      }
+      items.cur_index = 0
+      const chunkResults = await Promise.all(
+        Array(+config.parallel).fill().map(async _ => await this.checkTrunkStream(items))
+      )
+      results.push([...chunkResults].flat())
     }
 
     return playlist
+  }
+
+  async checkTrunkStream(items, chunkResults = []) {
+    let item = null
+    while (items.cur_index < items.length) {
+      item = items[items.cur_index]
+      if (item.state === 0) break
+      items.cur_index++
+    }
+    if (items.cur_index >= items.length) return chunkResults
+    item.state = 1
+    const result = await this.checkStream(item)
+    item.state = 2
+    chunkResults.push(result)
+    await this.checkTrunkStream(items, chunkResults)
   }
 
   async checkStream(item) {
