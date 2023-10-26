@@ -45,7 +45,9 @@ npm install iptv-checker
 ```
 
 ```js
-var checker = require('iptv-checker')
+var IPTVChecker = require('iptv-checker')
+
+var checker = new IPTVChecker()
 
 // using playlist url
 checker.checkPlaylist('https://some-playlist.lol/list.m3u').then(results => {
