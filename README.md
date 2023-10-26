@@ -237,4 +237,4 @@ If you find a bug or want to contribute to the code or documentation, you can he
 
 ## License
 
-[MIT](http://opensource.org/licenses/MIT)
+[MIT](LICENSE)
