@@ -103,7 +103,7 @@ async function init() {
     logger.info(`\n${result}`)
     process.exit(0)
   } catch (err) {
-    logger.error(err)
+    logger.error(err.message)
     process.exit(1)
   }
 }

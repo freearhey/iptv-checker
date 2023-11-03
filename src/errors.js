@@ -56,7 +56,6 @@ module.exports = {
   FFMPEG_INPUT_OUTPUT_ERROR: 'FFMPEG Input/output Error',
   FFMPEG_PROTOCOL_NOT_FOUND: 'FFMPEG Protocol Not Found',
   FFMPEG_INVALID_DATA: 'FFMPEG Invalid Data',
-  FFMPEG_PROCESS_TIMEOUT: 'FFMPEG Process Timeout',
   FFMPEG_UNDEFINED: 'FFMPEG Undefined Error',
   FFMPEG_STREAMS_NOT_FOUND: 'FFMPEG Streams Not Found',
 }

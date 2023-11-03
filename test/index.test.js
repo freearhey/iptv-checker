@@ -31,7 +31,7 @@ test(`Should process a playlist URL`, done => {
 test(`Should process a stream URL`, done => {
   const url = 'https://live-hls-v3-aja.getaj.net/AJA-V3/index.m3u8'
   checker
-    .checkStream({ url, timeout: 10000 })
+    .checkStream({ url, timeout: 50000 })
     .then(results => {
       expect(results.status.ok).toBeTruthy()
       done()
