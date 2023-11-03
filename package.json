@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "lint": "npx eslint ./src/**/*.js ./test/*.js",
+    "lint": "npx eslint \"./{src,test}/**/*.js\"",
     "test": "npx jest",
     "prePush": "npm-run-all -p lint test"
   },
