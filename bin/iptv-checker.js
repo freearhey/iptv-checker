@@ -30,6 +30,11 @@ argv
     60000
   )
   .option(
+    '-w, --wait <timeout>',
+    'Set the number of milliseconds before next stream checked',
+    1000
+  )
+  .option(
     '-p, --parallel <number>',
     'Batch size of items to check concurrently',
     1
@@ -54,6 +59,7 @@ const config = {
   userAgent: argv.userAgent,
   timeout: parseInt(argv.timeout),
   parallel: +argv.parallel,
+  wait: argv.wait,
   setUp,
   afterEach,
 }

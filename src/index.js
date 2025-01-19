@@ -105,10 +105,19 @@ class IPTVChecker {
     } else {
       logger.debug(`FAILED: ${item.url} (${item.status.message})`.red)
     }
-
+    logger.debug(`waiting ${config.wait} milliseconds`);
     await config.afterEach(item)
-
+    await this.Wait();
     return item
+  }
+
+  Wait() {
+    const { config } = this
+    return new Promise((resolve, reject) => {
+        setTimeout(()=> {
+            resolve();
+        },config.wait)
+    })
   }
 }
 
