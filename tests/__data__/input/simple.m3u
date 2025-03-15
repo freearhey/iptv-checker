@@ -1,0 +1,6 @@
+#EXTM3U
+#EXTINF:-1,30A We Love Cars
+https://30a-tv.com/feeds/vidaa/cars.m3u8
+#EXTINF:-1 tvg-id="PlutoTVTopGear.it" tvg-logo="https://images.pluto.tv/channels/64c109a4798def0008a6e03e/thumbnail.jpg" group-title="Auto;Comedy;Entertainment",Pluto TV Top Gear
+#EXTVLCOPT:http-referrer=https://pluto.tv/it/live-tv/64c109a4798def0008a6e03e
+https://stitcher-ipv4.pluto.tv/v1/stitch/embed/hls/channel/64c109a4798def0008a6e03e/master.m3u8?advertisingId={PSID}&appVersion=unknown&deviceDNT={TARGETOPT}&deviceId={PSID}&deviceLat=0&deviceLon=0&deviceMake=samsung&deviceModel=samsung&deviceType=samsung-tvplus&deviceVersion=unknown&embedPartner=samsung-tvplus&profileFloor=&profileLimit=&samsung_app_domain={APP_DOMAIN}&samsung_app_name={APP_NAME}&us_privacy=1YNY

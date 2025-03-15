@@ -1,6 +1,0 @@
-#EXTM3U x-tvg-url="http://epg.it999.ru/edem.xml.gz"
-#EXTINF:-1,RLS-TV
-#EXTVLCOPT:http-user-agent=smartlabs
-http://hls.goodgame.ru/hls/6147.m3u8
-#EXTINF:-1,Народная дипломатия
-http://hls.goodgame.ru/hls/33226.m3u8
