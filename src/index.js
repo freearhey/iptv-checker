@@ -1,115 +1,44 @@
-require('colors')
-const { isUri } = require('valid-url')
-const commandExists = require('command-exists')
-const eachLimit = require('async/eachLimit')
-const { parsePlaylist } = require('./parser')
-const cache = require('./cache')
-const Logger = require('./Logger')
-const cpus = require('os').cpus()
-const { loadStream } = require('./http')
-const ffprobe = require('./ffprobe')
+import app from '../package.json' with { type: 'json' }
+import { PlaylistTester } from './core/PlaylistTester.js'
+import { StreamTester } from './core/StreamTester.js'
+import { server } from '../tests/__mocks__/node.js'
+import { Logger } from './core/Logger.js'
+import { TESTING } from './constants.js'
+import { cpus } from 'os'
+import 'colors'
+
+if (TESTING) {
+  server.listen()
+}
 
 const defaultConfig = {
   debug: false,
-  userAgent: null,
+  userAgent: `IPTVChecker/${app.version} (${app.homepage})`,
   timeout: 60000,
-  parallel: cpus.length,
-  setUp: playlist => {}, // eslint-disable-line
-  afterEach: item => {}, // eslint-disable-line
-  beforeEach: item => {}, // eslint-disable-line
+  parallel: cpus().length,
+  delay: 0,
+  retry: 0,
+  setUp: () => {},
+  afterEach: () => {},
+  beforeEach: () => {}
 }
 
-class IPTVChecker {
+export class IPTVChecker {
   constructor(opts = {}) {
     this.config = { ...defaultConfig, ...opts }
-    this.logger = new Logger(this.config)
+    this.logger = new Logger({ config: this.config })
+    this.playlistTester = new PlaylistTester({ logger: this.logger, config: this.config })
+    this.streamTester = new StreamTester({ logger: this.logger, config: this.config })
+
+    this.logger.debug('IPTVChecker.constructor')
+    this.logger.debug(this.config)
   }
 
   async checkPlaylist(input) {
-    await commandExists(`ffprobe`).catch(() => {
-      throw new Error(
-        `Executable "ffprobe" not found. Have you installed "ffmpeg"?`
-      )
-    })
-
-    if (
-      !(input instanceof Object) &&
-      !Buffer.isBuffer(input) &&
-      typeof input !== `string`
-    ) {
-      throw new Error('Unsupported input type')
-    }
-
-    const results = []
-    const duplicates = []
-    const config = this.config
-    const logger = this.logger
-
-    logger.debug({ config })
-
-    const playlist = await parsePlaylist(input).catch(err => {
-      throw new Error(err)
-    })
-
-    await config.setUp(playlist)
-
-    const items = playlist.items
-      .map(item => {
-        if (!isUri(item.url)) return null
-
-        if (cache.check(item)) {
-          duplicates.push(item)
-
-          return null
-        } else {
-          cache.add(item)
-
-          return item
-        }
-      })
-      .filter(Boolean)
-
-    for (let item of duplicates) {
-      item.status = { ok: false, code: 'DUPLICATE', message: `Duplicate` }
-      await config.afterEach(item)
-      results.push(item)
-    }
-
-    if (+config.parallel === 1) {
-      for (let item of items) {
-        const checkedItem = await this.checkStream(item)
-
-        results.push(checkedItem)
-      }
-    } else {
-      await eachLimit(items, +config.parallel, async item => {
-        const result = await this.checkStream(item)
-        results.push(result)
-      })
-    }
-
-    return playlist
+    return this.playlistTester.test(input)
   }
 
   async checkStream(item) {
-    const { config, logger } = this
-
-    await config.beforeEach(item)
-
-    item.status = await loadStream(item, config, logger)
-      .then(() => ffprobe(item, config, logger))
-      .catch(status => status)
-
-    if (item.status.ok) {
-      logger.debug(`OK: ${item.url}`.green)
-    } else {
-      logger.debug(`FAILED: ${item.url} (${item.status.message})`.red)
-    }
-
-    await config.afterEach(item)
-
-    return item
+    return this.streamTester.test(item)
   }
 }
-
-module.exports = IPTVChecker

@@ -1,0 +1,65 @@
+const codes = {
+  400: 'HTTP_BAD_REQUEST',
+  401: 'HTTP_UNAUTHORIZED',
+  402: 'HTTP_PAYMENT_REQUIRED',
+  403: 'HTTP_FORBIDDEN',
+  404: 'HTTP_NOT_FOUND',
+  405: 'HTTP_METHOD_NOT_ALLOWED',
+  406: 'HTTP_NOT_ACCEPTABLE',
+  407: 'HTTP_PROXY_AUTHENTICATION_REQUIRED',
+  408: 'HTTP_REQUEST_TIMEOUT',
+  409: 'HTTP_CONFLICT',
+  410: 'HTTP_GONE',
+  411: 'HTTP_LENGTH_REQUIRED',
+  412: 'HTTP_PRECONDITION_FAILED',
+  413: 'HTTP_REQUEST_TOO_LONG',
+  414: 'HTTP_REQUEST_URI_TOO_LONG',
+  415: 'HTTP_UNSUPPORTED_MEDIA_TYPE',
+  416: 'HTTP_REQUESTED_RANGE_NOT_SATISFIABLE',
+  417: 'HTTP_EXPECTATION_FAILED',
+  418: 'HTTP_IM_A_TEAPOT',
+  419: 'HTTP_INSUFFICIENT_SPACE_ON_RESOURCE',
+  420: 'HTTP_METHOD_FAILURE',
+  421: 'HTTP_MISDIRECTED_REQUEST',
+  422: 'HTTP_UNPROCESSABLE_ENTITY',
+  423: 'HTTP_LOCKED',
+  424: 'HTTP_FAILED_DEPENDENCY',
+  428: 'HTTP_PRECONDITION_REQUIRED',
+  429: 'HTTP_TOO_MANY_REQUESTS',
+  431: 'HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE',
+  451: 'HTTP_UNAVAILABLE_FOR_LEGAL_REASONS',
+  500: 'HTTP_INTERNAL_SERVER_ERROR',
+  501: 'HTTP_NOT_IMPLEMENTED',
+  502: 'HTTP_BAD_GATEWAY',
+  503: 'HTTP_SERVICE_UNAVAILABLE',
+  504: 'HTTP_GATEWAY_TIMEOUT',
+  505: 'HTTP_HTTP_VERSION_NOT_SUPPORTED',
+  507: 'HTTP_INSUFFICIENT_STORAGE',
+  511: 'HTTP_NETWORK_AUTHENTICATION_REQUIRED'
+}
+
+export class HttpErrorParser {
+  parse(err) {
+    if (err.response) {
+      return codes[err.response.status]
+    } else if (err.message && err.message.startsWith('timeout')) {
+      return 'HTTP_REQUEST_TIMEOUT'
+    } else if (err.message && err.message.includes('ECONNREFUSED')) {
+      return 'HTTP_INTERNAL_SERVER_ERROR'
+    } else if (err.message && err.message.startsWith('maxContentLength')) {
+      return 'HTTP_MAX_CONTENT_LENGTH_EXCEEDED'
+    } else if (err.code === 'EPROTO') {
+      return 'HTTP_PROTOCOL_ERROR'
+    } else if (err.code === 'ENETUNREACH') {
+      return 'HTTP_NETWORK_UNREACHABLE'
+    } else if (err.code === 'ENOTFOUND') {
+      return 'HTTP_NOT_FOUND'
+    } else if (err.code === 'ECONNRESET') {
+      return 'HTTP_ECONNRESET'
+    } else if (err.code.startsWith('HPE')) {
+      return 'HTTP_PARSE_ERROR'
+    }
+
+    return 'HTTP_UNDEFINED'
+  }
+}

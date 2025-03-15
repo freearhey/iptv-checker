@@ -1,6 +1,6 @@
-class Logger {
-  constructor({ debug }) {
-    this.debugMode = debug
+export class Logger {
+  constructor({ config }) {
+    this.config = config
   }
 
   info(msg) {
@@ -12,8 +12,7 @@ class Logger {
   }
 
   debug(msg) {
-    if (!this.debugMode) return
-    this.print(msg)
+    if (this.config.debug) this.print(msg)
   }
 
   print(msg) {
@@ -22,5 +21,3 @@ class Logger {
     } else console.log(msg)
   }
 }
-
-module.exports = Logger
