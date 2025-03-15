@@ -1,89 +1,92 @@
 #! /usr/bin/env node
 
-const fs = require('fs')
-const argv = require('commander')
-const getStdin = require('get-stdin')
-const ProgressBar = require('progress')
-const dateFormat = require('dateformat')
-const { version, homepage } = require('../package.json')
-const IPTVChecker = require('../src/index')
-const Logger = require('../src/Logger')
+import app from '../package.json' with { type: 'json' }
+import { Playlist } from '../src/core/Playlist.js'
+import { Logger } from '../src/core/Logger.js'
+import { IPTVChecker } from '../src/index.js'
+import dateFormat from 'dateformat'
+import { program } from 'commander'
+import ProgressBar from 'progress'
+import getStdin from 'get-stdin'
+import { cpus } from 'os'
+import fs from 'fs'
 
-let seedFile
+let stdin
+
+program
+  .version(app.version, '-v, --version')
+  .name('iptv-checker')
+  .description('Utility to check M3U playlists entries')
+  .usage('[options] [file|url]')
+  .option(
+    '-o, --output <dir>',
+    'Path to output directory',
+    `iptv-checker_${dateFormat(new Date(), 'yyyymmddhhMMss')}`
+  )
+  .option('-t, --timeout <number>', 'Set the number of milliseconds for each request', 60000)
+  .option('-d, --delay <number>', 'Set delay between requests in milliseconds', 0)
+  .option('-r, --retry <number>', 'Set the number of retries for failed requests', 0)
+  .option('-p, --parallel <number>', 'Batch size of items to check concurrently', cpus().length)
+  .option(
+    '-a, --user-agent <string>',
+    'Set custom HTTP User-Agent',
+    `IPTVChecker/${app.version} (${app.homepage})`
+  )
+  .option('-x, --proxy <url>', 'Set HTTP proxy to tunnel through')
+  .option('-k, --insecure', 'Allow insecure connections when using SSL')
+  .option('-D, --debug', 'Enable debug mode')
+  .action((str = null) => {
+    stdin = str
+  })
+  .argument('[file|url]', 'Path to the file or url')
+  .parse(process.argv)
+
+const options = program.opts()
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = !+options.insecure
+
+const config = {
+  debug: options.debug || false,
+  insecure: options.insecure,
+  userAgent: options.userAgent,
+  proxy: options.proxy,
+  timeout: parseInt(options.timeout),
+  parallel: +options.parallel,
+  delay: +options.delay,
+  retry: +options.retry,
+  setUp,
+  afterEach
+}
+
 let bar
 const stats = {
   total: 0,
   online: 0,
   offline: 0,
-  duplicates: 0,
+  duplicates: 0
 }
 
-argv
-  .version(version, '-v, --version')
-  .name('iptv-checker')
-  .description('Utility to check M3U playlists entries')
-  .usage('[options] [file-or-url]')
-  .option('-o, --output <output>', 'Path to output directory')
-  .option(
-    '-t, --timeout <timeout>',
-    'Set the number of milliseconds for each request',
-    60000
-  )
-  .option(
-    '-p, --parallel <number>',
-    'Batch size of items to check concurrently',
-    1
-  )
-  .option(
-    '-a, --user-agent <user-agent>',
-    'Set custom HTTP User-Agent',
-    `IPTVChecker/${version} (${homepage})`
-  )
-  .option('-k, --insecure', 'Allow insecure connections when using SSL')
-  .option('-d, --debug', 'Toggle debug mode')
-  .action(function (file = null) {
-    seedFile = file
-  })
-  .parse(process.argv)
-
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = !+argv.insecure
-
-const config = {
-  debug: argv.debug || false,
-  insecure: argv.insecure,
-  userAgent: argv.userAgent,
-  timeout: parseInt(argv.timeout),
-  parallel: +argv.parallel,
-  setUp,
-  afterEach,
-}
-
-const logger = new Logger(config)
-
-const outputDir =
-  argv.output || `iptv-checker-${dateFormat(new Date(), 'd-m-yyyy-hh-MM-ss')}`
-const onlineFile = `${outputDir}/online.m3u`
-const offlineFile = `${outputDir}/offline.m3u`
-const duplicatesFile = `${outputDir}/duplicates.m3u`
-
+const outputDir = options.output
 try {
   fs.lstatSync(outputDir)
 } catch (e) {
   fs.mkdirSync(outputDir)
 }
 
-fs.writeFileSync(onlineFile, '#EXTM3U\n')
-fs.writeFileSync(offlineFile, '#EXTM3U\n')
-fs.writeFileSync(duplicatesFile, '#EXTM3U\n')
+const onlinePlaylist = new Playlist(`${outputDir}/online.m3u`)
+const offlinePlaylist = new Playlist(`${outputDir}/offline.m3u`)
+const duplicatesPlaylist = new Playlist(`${outputDir}/duplicates.m3u`)
 
 init()
 
 async function init() {
+  const logger = new Logger(config)
+
   try {
-    if (!seedFile || !seedFile.length) seedFile = await getStdin()
+    if (!stdin || !stdin.length) stdin = await getStdin()
 
     const checker = new IPTVChecker(config)
-    const checked = await checker.checkPlaylist(seedFile)
+    const checked = await checker.checkPlaylist(stdin)
 
     stats.online = checked.items.filter(item => item.status.ok).length
     stats.offline = checked.items.filter(
@@ -97,7 +100,7 @@ async function init() {
       `Total: ${stats.total}`,
       `Online: ${stats.online}`.green,
       `Offline: ${stats.offline}`.red,
-      `Duplicates: ${stats.duplicates}`.yellow,
+      `Duplicates: ${stats.duplicates}`.yellow
     ].join('\n')
 
     logger.info(`\n${result}`)
@@ -110,11 +113,11 @@ async function init() {
 
 function afterEach(item) {
   if (item.status.ok) {
-    writeToFile(onlineFile, item)
+    onlinePlaylist.append(item)
   } else if (item.status.code === `DUPLICATE`) {
-    writeToFile(duplicatesFile, item)
+    duplicatesPlaylist.append(item)
   } else {
-    writeToFile(offlineFile, item, item.status.message)
+    offlinePlaylist.append(item)
   }
 
   if (!config.debug) {
@@ -125,17 +128,6 @@ function afterEach(item) {
 function setUp(playlist) {
   stats.total = playlist.items.length
   bar = new ProgressBar('[:bar] :current/:total (:percent) ', {
-    total: stats.total,
+    total: stats.total
   })
-}
-
-function writeToFile(path, item, message = null) {
-  const lines = item.raw.split('\n')
-  const extinf = lines[0]
-
-  if (message) {
-    lines[0] = `${extinf.trim()} (${message})`
-  }
-
-  fs.appendFileSync(path, `${lines.join('\n')}\n`)
 }
