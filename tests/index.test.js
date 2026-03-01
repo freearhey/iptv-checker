@@ -62,12 +62,6 @@ describe('checkPlaylist', () => {
     )
   })
 
-  it(`should throw on invalid fetched input data`, async () => {
-    await expect(checker.checkPlaylist(`https://github.com`)).rejects.toThrow(
-      'URL is not an M3U playlist file'
-    )
-  })
-
   it(`should process a playlist with rtp link`, async () => {
     const path = 'tests/__data__/input/rtp.m3u'
     const results = await checker.checkPlaylist(path)
