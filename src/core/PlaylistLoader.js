@@ -14,11 +14,6 @@ export class PlaylistLoader {
 
     client.interceptors.response.use(
       response => {
-        const contentType = response.headers?.['content-type'] || ''
-        if (!/mpegurl/.test(contentType)) {
-          throw new Error('URL is not an M3U playlist file')
-        }
-
         return response.data
       },
       () => {
