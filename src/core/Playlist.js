@@ -9,7 +9,7 @@ export class Playlist {
 
   append(item) {
     const message = item?.status?.message || null
-    const lines = item.raw.split('\r\n')
+    const lines = item.raw.split(/\r?\n/)
     const extinf = lines[0]
 
     if (message) {
