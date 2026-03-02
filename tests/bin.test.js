@@ -11,8 +11,7 @@ it(`should process a local playlist file`, () => {
     encoding: 'utf8'
   })
 
-  expect(load('output/duplicates.m3u')).toBe(load('expected/output/simple/duplicates.m3u'))
-  expect(load('output/offline.m3u')).toBe(load('expected/output/simple/offline.m3u'))
+  expect(load('output/failed.m3u')).toBe(load('expected/output/simple/failed.m3u'))
   expect(load('output/online.m3u')).toBe(load('expected/output/simple/online.m3u'))
 })
 
@@ -22,8 +21,7 @@ it(`should process playlist piped from stdin`, () => {
     { encoding: 'utf8' }
   )
 
-  expect(load('output/duplicates.m3u')).toBe(load('expected/output/simple/duplicates.m3u'))
-  expect(load('output/offline.m3u')).toBe(load('expected/output/simple/offline.m3u'))
+  expect(load('output/failed.m3u')).toBe(load('expected/output/simple/failed.m3u'))
   expect(load('output/online.m3u')).toBe(load('expected/output/simple/online.m3u'))
 })
 
@@ -32,8 +30,7 @@ it(`should process a playlist URL`, () => {
     encoding: 'utf8'
   })
 
-  expect(load('output/duplicates.m3u')).toBe(load('expected/output/simple/duplicates.m3u'))
-  expect(load('output/offline.m3u')).toBe(load('expected/output/simple/offline.m3u'))
+  expect(load('output/failed.m3u')).toBe(load('expected/output/simple/failed.m3u'))
   expect(load('output/online.m3u')).toBe(load('expected/output/simple/online.m3u'))
 })
 
@@ -43,8 +40,7 @@ it(`should respect proxy argument`, () => {
     { encoding: 'utf8' }
   )
 
-  expect(load('output/duplicates.m3u')).toBe(load('expected/output/simple/duplicates.m3u'))
-  expect(load('output/offline.m3u')).toBe(load('expected/output/simple/offline.m3u'))
+  expect(load('output/failed.m3u')).toBe(load('expected/output/simple/failed.m3u'))
   expect(load('output/online.m3u')).toBe(load('expected/output/simple/online.m3u'))
 })
 
