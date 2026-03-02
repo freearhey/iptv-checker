@@ -13,7 +13,7 @@ export class Playlist {
     const extinf = lines[0]
 
     if (message) {
-      lines[0] = `${extinf.trim()} (${message})`
+      lines[0] = `${extinf.trim()} [${message}]`
     }
 
     const output = `${lines.join('\r\n')}\r\n`
