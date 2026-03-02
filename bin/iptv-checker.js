@@ -62,8 +62,7 @@ let bar
 const stats = {
   total: 0,
   online: 0,
-  offline: 0,
-  duplicates: 0
+  failed: 0
 }
 
 const outputDir = options.output
@@ -74,8 +73,7 @@ try {
 }
 
 const onlinePlaylist = new Playlist(`${outputDir}/online.m3u`)
-const offlinePlaylist = new Playlist(`${outputDir}/offline.m3u`)
-const duplicatesPlaylist = new Playlist(`${outputDir}/duplicates.m3u`)
+const failedPlaylist = new Playlist(`${outputDir}/failed.m3u`)
 
 init()
 
@@ -89,18 +87,12 @@ async function init() {
     const checked = await checker.checkPlaylist(stdin)
 
     stats.online = checked.items.filter(item => item.status.ok).length
-    stats.offline = checked.items.filter(
-      item => !item.status.ok && item.status.code !== `DUPLICATE`
-    ).length
-    stats.duplicates = checked.items.filter(
-      item => !item.status.ok && item.status.code === `DUPLICATE`
-    ).length
+    stats.failed = checked.items.filter(item => !item.status.ok).length
 
     const result = [
       `Total: ${stats.total}`,
       `Online: ${stats.online}`.green,
-      `Offline: ${stats.offline}`.red,
-      `Duplicates: ${stats.duplicates}`.yellow
+      `Failed: ${stats.failed}`.red
     ].join('\n')
 
     logger.info(`\n${result}`)
@@ -114,10 +106,8 @@ async function init() {
 function afterEach(item) {
   if (item.status.ok) {
     onlinePlaylist.append(item)
-  } else if (item.status.code === `DUPLICATE`) {
-    duplicatesPlaylist.append(item)
   } else {
-    offlinePlaylist.append(item)
+    failedPlaylist.append(item)
   }
 
   if (!config.debug) {
