@@ -2,11 +2,8 @@ import { FFprobeCommandBuilder } from './FFprobeCommandBuilder.js'
 import { FFprobeOutputParser } from './FFprobeOutputParser.js'
 import { FFprobeErrorParser } from './FFprobeErrorParser.js'
 import { TESTING } from '../constants.js'
-import { exec } from 'child_process'
+import { spawn } from 'child_process'
 import errors from '../errors.js'
-import util from 'util'
-
-const execAsync = util.promisify(exec)
 
 export class FFprobe {
   constructor({ config, logger }) {
@@ -31,7 +28,7 @@ export class FFprobe {
         const ffprobeOutput = (await import('../../tests/__mocks__/ffprobe.js')).default
         output = ffprobeOutput[item.url]
       } else {
-        output = await execAsync(command, { timeout })
+        output = await spawnFiltered(command, timeout)
       }
 
       this.logger.debug(output)
@@ -72,6 +69,47 @@ export class FFprobe {
       }
     }
   }
+}
+
+function spawnFiltered(command, timeout) {
+  return new Promise((resolve, reject) => {
+    const [cmd, ...args] = command.match(/(?:[^\s"]+|"[^"]*")+/g)
+    const proc = spawn(cmd, args.map(a => a.replace(/^"|"$/g, '')))
+
+    let stdout = ''
+    let stderr = ''
+    let killed = false
+
+    const timer = timeout ? setTimeout(() => {
+      killed = true
+      proc.kill()
+      reject(Object.assign(new Error('process timeout'), { stdout, stderr }))
+    }, timeout) : null
+
+    proc.stdout.on('data', chunk => { stdout += chunk })
+    proc.stderr.on('data', chunk => {
+      const filtered = chunk.toString()
+        .split('\n')
+        .filter(line => !line.includes("Skip ('#EXT-X-"))
+        .join('\n')
+      stderr += filtered
+    })
+
+    proc.on('close', code => {
+      if (killed) return
+      if (timer) clearTimeout(timer)
+      if (code !== 0) {
+        reject(Object.assign(new Error(`ffprobe exited with code ${code}`), { stdout, stderr }))
+      } else {
+        resolve({ stdout, stderr })
+      }
+    })
+
+    proc.on('error', err => {
+      if (timer) clearTimeout(timer)
+      reject(Object.assign(err, { stdout, stderr }))
+    })
+  })
 }
 
 function isJSON(str) {
