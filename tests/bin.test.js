@@ -21,7 +21,7 @@ it(`should process playlist piped from stdin`, () => {
 
   if (platform === 'win32') {
     execSync(
-      `type "tests\\__data__\\input\\simple.m3u | node bin/iptv-checker.js -o tests/__data__/output`,
+      `type "tests\\__data__\\input\\simple.m3u" | node bin/iptv-checker.js -o tests/__data__/output`,
       { encoding: 'utf8' }
     )
   } else {
