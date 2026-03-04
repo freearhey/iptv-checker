@@ -1,0 +1,5 @@
+#EXTM3U
+#EXTINF:-1,Link 1
+https://30a-tv.com/feeds/vidaa/cars.m3u8
+#EXTINF:-1,Link 3
+http://30a-tv.com/feeds/vidaa/cars.m3u8?deviceLon=0&deviceLat=0

@@ -1,6 +1,3 @@
-node_modules
-iptv-checker_*
-output
-.vscode
-auth
-tmp
+/node_modules/
+/iptv-checker_*/
+/output/
