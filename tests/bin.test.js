@@ -1,3 +1,4 @@
+import os from 'os'
 import fs from 'fs-extra'
 import { execSync } from 'child_process'
 
@@ -16,10 +17,19 @@ it(`should process a local playlist file`, () => {
 })
 
 it(`should process playlist piped from stdin`, () => {
-  execSync(
-    `cat tests/__data__/input/simple.m3u | node bin/iptv-checker.js -o tests/__data__/output`,
-    { encoding: 'utf8' }
-  )
+  const platform = os.platform()
+
+  if (platform === 'win32') {
+    execSync(
+      `type tests/__data__/input/simple.m3u | node bin/iptv-checker.js -o tests/__data__/output`,
+      { encoding: 'utf8' }
+    )
+  } else {
+    execSync(
+      `cat tests/__data__/input/simple.m3u | node bin/iptv-checker.js -o tests/__data__/output`,
+      { encoding: 'utf8' }
+    )
+  }
 
   expect(load('output/failed.m3u')).toBe(load('expected/output/simple/failed.m3u'))
   expect(load('output/online.m3u')).toBe(load('expected/output/simple/online.m3u'))
