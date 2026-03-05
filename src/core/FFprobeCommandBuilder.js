@@ -9,14 +9,7 @@ export class FFprobeCommandBuilder {
     const timeout = item.timeout || this.config.timeout
     const proxy = this.config.proxy
 
-    let args = [
-      `ffprobe`,
-      `-of json`,
-      `-v verbose`,
-      `-hide_banner`,
-      `-show_streams`,
-      `-show_format`
-    ]
+    let args = [`ffprobe`, `-of json`, `-v error`, `-hide_banner`, `-show_streams`, `-show_format`]
 
     if (timeout) {
       args.push(`-timeout`, `"${timeout * 1000}"`)
