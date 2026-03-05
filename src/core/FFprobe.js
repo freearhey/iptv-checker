@@ -38,7 +38,7 @@ export class FFprobe {
 
       const { stdout, stderr } = output
 
-      if (!stdout || !isJSON(stdout) || !stderr) {
+      if (stdout === undefined || !isJSON(stdout) || stderr === undefined) {
         this.logger.debug('FFMPEG_UNDEFINED')
         this.logger.debug(stdout)
         this.logger.debug(stderr)
