@@ -8,3 +8,7 @@ export function normalizeUrl(url) {
 export function isUri(string) {
   return _isUri(encodeURI(string))
 }
+
+export function isValidUserAgent(string) {
+  return /^\w+\/(\d|\.)+ \([^)]+\).*/.test(string) || /^\w+\/(\d|\.)+$/.test(string)
+}
