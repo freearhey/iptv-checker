@@ -1,10 +1,15 @@
+import { isValidUserAgent } from './utils.js'
+
 export class FFprobeCommandBuilder {
   constructor({ config }) {
     this.config = config
   }
 
   build(item) {
-    const userAgent = item?.http?.['user-agent'] ? item.http['user-agent'] : this.config.userAgent
+    const userAgent =
+      item?.http?.['user-agent'] && isValidUserAgent(item.http['user-agent'])
+        ? item.http['user-agent']
+        : this.config.userAgent
     const referer = item?.http?.referrer ? item.http.referrer : this.config.httpReferer
     const timeout = item.timeout || this.config.timeout
     const proxy = this.config.proxy
