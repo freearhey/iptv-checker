@@ -1,7 +1,7 @@
+import { isValidUserAgent, normalizeUrl } from './utils.js'
 import { HttpErrorParser } from './HttpErrorParser.js'
 import { SocksProxyAgent } from 'socks-proxy-agent'
 import { ProxyParser } from './ProxyParser.js'
-import { normalizeUrl } from './utils.js'
 import { TESTING } from '../constants.js'
 import axiosRetry from 'axios-retry'
 import errors from '../errors.js'
@@ -51,7 +51,7 @@ export class StreamLoader {
 
     const timeout = item.timeout || this.config.timeout
     let source = this.cancelToken.source()
-    let options = {
+    let clientOptions = {
       timeout,
       headers: {},
       cancelToken: source.token
@@ -64,14 +64,16 @@ export class StreamLoader {
     }
 
     const userAgent =
-      item.http && item.http['user-agent'] ? item.http['user-agent'] : this.config.userAgent
+      item.http && item.http['user-agent'] && isValidUserAgent(item.http['user-agent'])
+        ? item.http['user-agent']
+        : this.config.userAgent
     if (userAgent) {
-      options.headers['User-Agent'] = userAgent
+      clientOptions.headers['User-Agent'] = userAgent
     }
 
     const referer = item.http && item.http.referrer ? item.http.referrer : this.config.httpReferer
     if (referer) {
-      options.headers['Referer'] = referer
+      clientOptions.headers['Referer'] = referer
     }
 
     if (this.config.proxy) {
@@ -84,17 +86,20 @@ export class StreamLoader {
       ) {
         const socksProxyAgent = new SocksProxyAgent(this.config.proxy)
 
-        options = {
-          ...options,
+        clientOptions = {
+          ...clientOptions,
           ...{ httpAgent: socksProxyAgent, httpsAgent: socksProxyAgent }
         }
       } else {
-        options = { ...options, ...{ proxy } }
+        clientOptions = { ...clientOptions, ...{ proxy } }
       }
     }
 
     try {
-      const response = await this.client(item.url, options)
+      this.logger.debug('clientOptions')
+      this.logger.debug(clientOptions)
+
+      const response = await this.client(item.url, clientOptions)
       const responseUrl = response.request.res.responseUrl
       const itemUrlNorm = normalizeUrl(item.url)
       const responseUrlNorm = normalizeUrl(responseUrl)
@@ -117,10 +122,11 @@ export class StreamLoader {
       }
 
       return response
-    } catch (err) {
-      this.logger.debug(err.stack)
+    } catch (error) {
+      this.logger.debug('error')
+      this.logger.debug(error)
 
-      const code = this.httpErrorParser.parse(err)
+      const code = this.httpErrorParser.parse(error)
 
       if (code === 'HTTP_MAX_CONTENT_LENGTH_EXCEEDED') {
         return Promise.resolve()
